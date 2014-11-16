@@ -28,11 +28,19 @@ type Organization struct {
 }
 
 func NewOrganizationFromResponse(response documents.OrganizationResponse) Organization {
+	if response.Metadata.CreatedAt == nil {
+		response.Metadata.CreatedAt = &time.Time{}
+	}
+
+	if response.Metadata.UpdatedAt == nil {
+		response.Metadata.UpdatedAt = &time.Time{}
+	}
+
 	return Organization{
 		GUID:                     response.Metadata.GUID,
 		URL:                      response.Metadata.URL,
-		CreatedAt:                response.Metadata.CreatedAt,
-		UpdatedAt:                response.Metadata.UpdatedAt,
+		CreatedAt:                *response.Metadata.CreatedAt,
+		UpdatedAt:                *response.Metadata.UpdatedAt,
 		Name:                     response.Entity.Name,
 		BillingEnabled:           response.Entity.BillingEnabled,
 		Status:                   response.Entity.Status,

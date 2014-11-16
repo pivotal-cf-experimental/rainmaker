@@ -4,10 +4,10 @@ import "time"
 
 type OrganizationResponse struct {
 	Metadata struct {
-		GUID      string    `json:"guid"`
-		URL       string    `json:"url"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
+		GUID      string     `json:"guid"`
+		URL       string     `json:"url"`
+		CreatedAt *time.Time `json:"created_at"`
+		UpdatedAt *time.Time `json:"updated_at"`
 	} `json:"metadata"`
 	Entity struct {
 		Name                     string `json:"name"`

@@ -26,10 +26,6 @@ var _ = Describe("OrganizationsService", func() {
 			if err != nil {
 				panic(err)
 			}
-			updatedAt, err := time.Parse(time.RFC3339, "2014-11-14T20:02:09+00:00")
-			if err != nil {
-				panic(err)
-			}
 
 			Expect(organization).To(Equal(rainmaker.Organization{
 				GUID:                     "org-001",
@@ -49,7 +45,7 @@ var _ = Describe("OrganizationsService", func() {
 				AppEventsURL:             "/v2/organizations/org-001/app_events",
 				SpaceQuotaDefinitionsURL: "/v2/organizations/org-001/space_quota_definitions",
 				CreatedAt:                createdAt,
-				UpdatedAt:                updatedAt,
+				UpdatedAt:                time.Time{},
 			}))
 		})
 
