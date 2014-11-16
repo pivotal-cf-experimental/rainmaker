@@ -21,11 +21,12 @@ var _ = Describe("OrganizationsService", func() {
 
 	Describe("Get", func() {
 		It("returns the organization matching the given GUID", func() {
-			organization := service.Get("org-001")
 			createdAt, err := time.Parse(time.RFC3339, "2014-11-11T18:34:16+00:00")
 			if err != nil {
 				panic(err)
 			}
+
+			organization := service.Get("org-001")
 
 			Expect(organization).To(Equal(rainmaker.Organization{
 				GUID:                     "org-001",
@@ -48,8 +49,8 @@ var _ = Describe("OrganizationsService", func() {
 				UpdatedAt:                time.Time{},
 			}))
 		})
-
 	})
+
 	Describe("ListUsers", func() {
 		It("returns the users belonging to the organization", func() {
 			usersList := service.ListUsers("org-001")
