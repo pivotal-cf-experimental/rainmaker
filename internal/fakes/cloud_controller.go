@@ -15,6 +15,7 @@ func NewCloudController() *CloudController {
 	router := mux.NewRouter()
 	router.HandleFunc("/v2/organizations/{guid}", fake.GetOrganization)
 	router.HandleFunc("/v2/organizations/{guid}/users", fake.GetOrganizationUsers)
+	router.HandleFunc("/v2/organizations/{guid}/billing_managers", fake.GetOrganizationBillingManagers)
 	router.HandleFunc("/v2/spaces/{guid}", fake.GetSpace)
 	router.HandleFunc("/v2/users", fake.GetUsers)
 
