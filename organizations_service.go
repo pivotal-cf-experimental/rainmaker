@@ -75,3 +75,18 @@ func (service OrganizationsService) ListAuditors(guid string) UsersList {
 
 	return NewUsersListFromResponse(response)
 }
+
+func (service OrganizationsService) ListManagers(guid string) UsersList {
+	_, body, err := service.client.makeRequest("GET", "/v2/organizations/"+guid+"/managers", nil)
+	if err != nil {
+		panic(err)
+	}
+
+	var response documents.UsersListResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		panic(err)
+	}
+
+	return NewUsersListFromResponse(response)
+}

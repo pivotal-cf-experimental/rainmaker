@@ -193,6 +193,53 @@ var _ = Describe("OrganizationsService", func() {
 				AuditedSpacesURL:               "/v2/users/user-jkl/audited_spaces",
 			}))
 		})
+	})
 
+	Describe("ListManagers", func() {
+		It("returns the managers belonging to the organization", func() {
+			usersList := service.ListManagers("org-004")
+			Expect(usersList.TotalResults).To(Equal(2))
+			Expect(usersList.TotalPages).To(Equal(1))
+			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-21T18:22:51+00:00")
+			if err != nil {
+				panic(err)
+			}
+
+			users := usersList.Users
+			Expect(len(users)).To(Equal(2))
+			Expect(users).To(ContainElement(rainmaker.User{
+				GUID:                           "user-aaa",
+				URL:                            "/v2/users/user-aaa",
+				CreatedAt:                      userCreatedAt,
+				UpdatedAt:                      time.Time{},
+				Admin:                          false,
+				Active:                         true,
+				DefaultSpaceGUID:               "",
+				SpacesURL:                      "/v2/users/user-aaa/spaces",
+				OrganizationsURL:               "/v2/users/user-aaa/organizations",
+				ManagedOrganizationsURL:        "/v2/users/user-aaa/managed_organizations",
+				BillingManagedOrganizationsURL: "/v2/users/user-aaa/billing_managed_organizations",
+				AuditedOrganizationsURL:        "/v2/users/user-aaa/audited_organizations",
+				ManagedSpacesURL:               "/v2/users/user-aaa/managed_spaces",
+				AuditedSpacesURL:               "/v2/users/user-aaa/audited_spaces",
+			}))
+
+			Expect(users).To(ContainElement(rainmaker.User{
+				GUID:                           "user-bbb",
+				URL:                            "/v2/users/user-bbb",
+				CreatedAt:                      userCreatedAt,
+				UpdatedAt:                      time.Time{},
+				Admin:                          false,
+				Active:                         true,
+				DefaultSpaceGUID:               "",
+				SpacesURL:                      "/v2/users/user-bbb/spaces",
+				OrganizationsURL:               "/v2/users/user-bbb/organizations",
+				ManagedOrganizationsURL:        "/v2/users/user-bbb/managed_organizations",
+				BillingManagedOrganizationsURL: "/v2/users/user-bbb/billing_managed_organizations",
+				AuditedOrganizationsURL:        "/v2/users/user-bbb/audited_organizations",
+				ManagedSpacesURL:               "/v2/users/user-bbb/managed_spaces",
+				AuditedSpacesURL:               "/v2/users/user-bbb/audited_spaces",
+			}))
+		})
 	})
 })
