@@ -96,7 +96,6 @@ var _ = Describe("OrganizationsService", func() {
 				ManagedSpacesURL:               "/v2/users/user-456/managed_spaces",
 				AuditedSpacesURL:               "/v2/users/user-456/audited_spaces",
 			}))
-
 		})
 	})
 })

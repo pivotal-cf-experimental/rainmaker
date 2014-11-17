@@ -16,6 +16,7 @@ func NewCloudController() *CloudController {
 	router.HandleFunc("/v2/organizations/{guid}", fake.GetOrganization)
 	router.HandleFunc("/v2/organizations/{guid}/users", fake.GetOrganizationUsers)
 	router.HandleFunc("/v2/spaces/{guid}", fake.GetSpace)
+	router.HandleFunc("/v2/users", fake.GetUsers)
 
 	fake.server = httptest.NewUnstartedServer(router)
 	return fake

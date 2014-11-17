@@ -49,4 +49,52 @@ var _ = Describe("SpacesService", func() {
 			}))
 		})
 	})
+
+	Describe("ListUsers", func() {
+		It("returns the users belonging to the space", func() {
+			usersList := service.ListUsers("space-001")
+			Expect(usersList.TotalResults).To(Equal(2))
+			Expect(usersList.TotalPages).To(Equal(1))
+			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-01T18:22:51+00:00")
+			if err != nil {
+				panic(err)
+			}
+
+			users := usersList.Users
+			Expect(len(users)).To(Equal(2))
+			Expect(users).To(ContainElement(rainmaker.User{
+				GUID:                           "user-abc",
+				URL:                            "/v2/users/user-abc",
+				CreatedAt:                      userCreatedAt,
+				UpdatedAt:                      time.Time{},
+				Admin:                          false,
+				Active:                         true,
+				DefaultSpaceGUID:               "",
+				SpacesURL:                      "/v2/users/user-abc/spaces",
+				OrganizationsURL:               "/v2/users/user-abc/organizations",
+				ManagedOrganizationsURL:        "/v2/users/user-abc/managed_organizations",
+				BillingManagedOrganizationsURL: "/v2/users/user-abc/billing_managed_organizations",
+				AuditedOrganizationsURL:        "/v2/users/user-abc/audited_organizations",
+				ManagedSpacesURL:               "/v2/users/user-abc/managed_spaces",
+				AuditedSpacesURL:               "/v2/users/user-abc/audited_spaces",
+			}))
+
+			Expect(users).To(ContainElement(rainmaker.User{
+				GUID:                           "user-xyz",
+				URL:                            "/v2/users/user-xyz",
+				CreatedAt:                      userCreatedAt,
+				UpdatedAt:                      time.Time{},
+				Admin:                          false,
+				Active:                         true,
+				DefaultSpaceGUID:               "",
+				SpacesURL:                      "/v2/users/user-xyz/spaces",
+				OrganizationsURL:               "/v2/users/user-xyz/organizations",
+				ManagedOrganizationsURL:        "/v2/users/user-xyz/managed_organizations",
+				BillingManagedOrganizationsURL: "/v2/users/user-xyz/billing_managed_organizations",
+				AuditedOrganizationsURL:        "/v2/users/user-xyz/audited_organizations",
+				ManagedSpacesURL:               "/v2/users/user-xyz/managed_spaces",
+				AuditedSpacesURL:               "/v2/users/user-xyz/audited_spaces",
+			}))
+		})
+	})
 })
