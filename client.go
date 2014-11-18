@@ -29,12 +29,12 @@ func NewClient(config Config) Client {
 func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, error) {
 	jsonBody, err := json.Marshal(requestArgs.Body)
 	if err != nil {
-		return 0, []byte{}, err
+		panic(err)
 	}
 
 	request, err := http.NewRequest(requestArgs.Method, client.Config.Host+requestArgs.Path, bytes.NewBuffer(jsonBody))
 	if err != nil {
-		return 0, []byte{}, err
+		panic(err)
 	}
 
 	request.Header.Set("Authorization", "Bearer "+requestArgs.Token)
@@ -42,12 +42,12 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 	networkClient := network.GetClient(network.Config{SkipVerifySSL: client.Config.SkipVerifySSL})
 	response, err := networkClient.Do(request)
 	if err != nil {
-		return 0, []byte{}, err
+		panic(err)
 	}
 
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return 0, []byte{}, err
+		panic(err)
 	}
 
 	return response.StatusCode, responseBody, nil
