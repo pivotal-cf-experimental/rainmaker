@@ -16,8 +16,12 @@ func NewOrganizationsService(client Client) *OrganizationsService {
 	}
 }
 
-func (service OrganizationsService) Get(guid string) Organization {
-	_, body, err := service.client.makeRequest("GET", "/v2/organizations/"+guid, nil)
+func (service OrganizationsService) Get(guid, token string) (Organization, error) {
+	_, body, err := service.client.makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/organizations/" + guid,
+		Token:  token,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -28,11 +32,15 @@ func (service OrganizationsService) Get(guid string) Organization {
 		panic(err)
 	}
 
-	return NewOrganizationFromResponse(response)
+	return NewOrganizationFromResponse(response), nil
 }
 
-func (service OrganizationsService) ListUsers(guid string) UsersList {
-	_, body, err := service.client.makeRequest("GET", "/v2/organizations/"+guid+"/users", nil)
+func (service OrganizationsService) ListUsers(guid, token string) (UsersList, error) {
+	_, body, err := service.client.makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/organizations/" + guid + "/users",
+		Token:  token,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -43,11 +51,15 @@ func (service OrganizationsService) ListUsers(guid string) UsersList {
 		panic(err)
 	}
 
-	return NewUsersListFromResponse(response)
+	return NewUsersListFromResponse(response), nil
 }
 
-func (service OrganizationsService) ListBillingManagers(guid string) UsersList {
-	_, body, err := service.client.makeRequest("GET", "/v2/organizations/"+guid+"/billing_managers", nil)
+func (service OrganizationsService) ListBillingManagers(guid, token string) (UsersList, error) {
+	_, body, err := service.client.makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/organizations/" + guid + "/billing_managers",
+		Token:  token,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -58,11 +70,15 @@ func (service OrganizationsService) ListBillingManagers(guid string) UsersList {
 		panic(err)
 	}
 
-	return NewUsersListFromResponse(response)
+	return NewUsersListFromResponse(response), nil
 }
 
-func (service OrganizationsService) ListAuditors(guid string) UsersList {
-	_, body, err := service.client.makeRequest("GET", "/v2/organizations/"+guid+"/auditors", nil)
+func (service OrganizationsService) ListAuditors(guid, token string) (UsersList, error) {
+	_, body, err := service.client.makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/organizations/" + guid + "/auditors",
+		Token:  token,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -73,11 +89,15 @@ func (service OrganizationsService) ListAuditors(guid string) UsersList {
 		panic(err)
 	}
 
-	return NewUsersListFromResponse(response)
+	return NewUsersListFromResponse(response), nil
 }
 
-func (service OrganizationsService) ListManagers(guid string) UsersList {
-	_, body, err := service.client.makeRequest("GET", "/v2/organizations/"+guid+"/managers", nil)
+func (service OrganizationsService) ListManagers(guid, token string) (UsersList, error) {
+	_, body, err := service.client.makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/organizations/" + guid + "/managers",
+		Token:  token,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -88,5 +108,5 @@ func (service OrganizationsService) ListManagers(guid string) UsersList {
 		panic(err)
 	}
 
-	return NewUsersListFromResponse(response)
+	return NewUsersListFromResponse(response), nil
 }

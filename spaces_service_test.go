@@ -21,7 +21,8 @@ var _ = Describe("SpacesService", func() {
 
 	Describe("Get", func() {
 		It("returns the space matching the given GUID", func() {
-			space := service.Get("space-001")
+			space, err := service.Get("space-001", "token-asd")
+			Expect(err).NotTo(HaveOccurred())
 			createdAt, err := time.Parse(time.RFC3339, "2014-10-09T22:02:26+00:00")
 			if err != nil {
 				panic(err)
@@ -52,7 +53,8 @@ var _ = Describe("SpacesService", func() {
 
 	Describe("ListUsers", func() {
 		It("returns the users belonging to the space", func() {
-			usersList := service.ListUsers("space-001")
+			usersList, err := service.ListUsers("space-001", "token-abc")
+			Expect(err).NotTo(HaveOccurred())
 			Expect(usersList.TotalResults).To(Equal(2))
 			Expect(usersList.TotalPages).To(Equal(1))
 			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-01T18:22:51+00:00")

@@ -1,7 +1,9 @@
 package fakes
 
 import (
+	"net/http"
 	"net/http/httptest"
+	"regexp"
 
 	"github.com/gorilla/mux"
 )
@@ -13,15 +15,16 @@ type CloudController struct {
 func NewCloudController() *CloudController {
 	fake := &CloudController{}
 	router := mux.NewRouter()
-	router.HandleFunc("/v2/organizations/{guid}", fake.GetOrganization)
-	router.HandleFunc("/v2/organizations/{guid}/users", fake.GetOrganizationUsers)
-	router.HandleFunc("/v2/organizations/{guid}/billing_managers", fake.GetOrganizationBillingManagers)
-	router.HandleFunc("/v2/organizations/{guid}/auditors", fake.GetOrganizationAuditors)
-	router.HandleFunc("/v2/organizations/{guid}/managers", fake.GetOrganizationManagers)
-	router.HandleFunc("/v2/spaces/{guid}", fake.GetSpace)
-	router.HandleFunc("/v2/users", fake.GetUsers)
+	router.HandleFunc("/v2/organizations/{guid}", fake.GetOrganization).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/users", fake.GetOrganizationUsers).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/billing_managers", fake.GetOrganizationBillingManagers).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/auditors", fake.GetOrganizationAuditors).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/managers", fake.GetOrganizationManagers).Methods("GET")
+	router.HandleFunc("/v2/spaces/{guid}", fake.GetSpace).Methods("GET")
+	router.HandleFunc("/v2/users", fake.GetUsers).Methods("GET")
 
-	fake.server = httptest.NewUnstartedServer(router)
+	handler := fake.RequireToken(router)
+	fake.server = httptest.NewUnstartedServer(handler)
 	return fake
 }
 
@@ -35,4 +38,21 @@ func (fake *CloudController) Close() {
 
 func (fake *CloudController) URL() string {
 	return fake.server.URL
+}
+
+func (fake *CloudController) RequireToken(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		ok, err := regexp.MatchString(`Bearer .+`, req.Header.Get("Authorization"))
+		if err != nil {
+			panic(err)
+		}
+
+		if !ok {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("401 Not Authorized"))
+			return
+		}
+
+		handler.ServeHTTP(w, req)
+	})
 }

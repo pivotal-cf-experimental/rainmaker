@@ -26,7 +26,8 @@ var _ = Describe("OrganizationsService", func() {
 				panic(err)
 			}
 
-			organization := service.Get("org-001")
+			organization, err := service.Get("org-001", "token-123")
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(organization).To(Equal(rainmaker.Organization{
 				GUID:                     "org-001",
@@ -53,7 +54,8 @@ var _ = Describe("OrganizationsService", func() {
 
 	Describe("ListUsers", func() {
 		It("returns the users belonging to the organization", func() {
-			usersList := service.ListUsers("org-001")
+			usersList, err := service.ListUsers("org-001", "token-456")
+			Expect(err).NotTo(HaveOccurred())
 			Expect(usersList.TotalResults).To(Equal(2))
 			Expect(usersList.TotalPages).To(Equal(1))
 			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-11T18:22:51+00:00")
@@ -101,7 +103,8 @@ var _ = Describe("OrganizationsService", func() {
 
 	Describe("ListBillingManagers", func() {
 		It("returns the billing managers belonging to the organization", func() {
-			usersList := service.ListBillingManagers("org-002")
+			usersList, err := service.ListBillingManagers("org-002", "token-987")
+			Expect(err).NotTo(HaveOccurred())
 			Expect(usersList.TotalResults).To(Equal(2))
 			Expect(usersList.TotalPages).To(Equal(1))
 			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-04T18:22:51+00:00")
@@ -149,7 +152,8 @@ var _ = Describe("OrganizationsService", func() {
 
 	Describe("ListAuditors", func() {
 		It("returns the auditors belonging to the organization", func() {
-			usersList := service.ListAuditors("org-003")
+			usersList, err := service.ListAuditors("org-003", "token-012")
+			Expect(err).NotTo(HaveOccurred())
 			Expect(usersList.TotalResults).To(Equal(2))
 			Expect(usersList.TotalPages).To(Equal(1))
 			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-05T18:22:51+00:00")
@@ -197,7 +201,8 @@ var _ = Describe("OrganizationsService", func() {
 
 	Describe("ListManagers", func() {
 		It("returns the managers belonging to the organization", func() {
-			usersList := service.ListManagers("org-004")
+			usersList, err := service.ListManagers("org-004", "token-345")
+			Expect(err).NotTo(HaveOccurred())
 			Expect(usersList.TotalResults).To(Equal(2))
 			Expect(usersList.TotalPages).To(Equal(1))
 			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-21T18:22:51+00:00")

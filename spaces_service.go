@@ -16,8 +16,12 @@ func NewSpacesService(client Client) *SpacesService {
 	}
 }
 
-func (service SpacesService) Get(guid string) Space {
-	_, body, err := service.client.makeRequest("GET", "/v2/spaces/"+guid, nil)
+func (service SpacesService) Get(guid, token string) (Space, error) {
+	_, body, err := service.client.makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/spaces/" + guid,
+		Token:  token,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -28,11 +32,15 @@ func (service SpacesService) Get(guid string) Space {
 		panic(err)
 	}
 
-	return NewSpaceFromResponse(response)
+	return NewSpaceFromResponse(response), nil
 }
 
-func (service SpacesService) ListUsers(guid string) UsersList {
-	_, body, err := service.client.makeRequest("GET", "/v2/users?q=space_guid:"+guid, nil)
+func (service SpacesService) ListUsers(guid, token string) (UsersList, error) {
+	_, body, err := service.client.makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/users?q=space_guid:" + guid,
+		Token:  token,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -43,5 +51,5 @@ func (service SpacesService) ListUsers(guid string) UsersList {
 		panic(err)
 	}
 
-	return NewUsersListFromResponse(response)
+	return NewUsersListFromResponse(response), nil
 }

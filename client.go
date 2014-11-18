@@ -26,16 +26,18 @@ func NewClient(config Config) Client {
 	return client
 }
 
-func (client Client) makeRequest(method, path string, body interface{}) (int, []byte, error) {
-	jsonBody, err := json.Marshal(body)
+func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, error) {
+	jsonBody, err := json.Marshal(requestArgs.Body)
 	if err != nil {
 		return 0, []byte{}, err
 	}
 
-	request, err := http.NewRequest(method, client.Config.Host+path, bytes.NewBuffer(jsonBody))
+	request, err := http.NewRequest(requestArgs.Method, client.Config.Host+requestArgs.Path, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return 0, []byte{}, err
 	}
+
+	request.Header.Set("Authorization", "Bearer "+requestArgs.Token)
 
 	networkClient := network.GetClient(network.Config{SkipVerifySSL: client.Config.SkipVerifySSL})
 	response, err := networkClient.Do(request)
@@ -49,4 +51,11 @@ func (client Client) makeRequest(method, path string, body interface{}) (int, []
 	}
 
 	return response.StatusCode, responseBody, nil
+}
+
+type requestArguments struct {
+	Method string
+	Path   string
+	Token  string
+	Body   interface{}
 }
