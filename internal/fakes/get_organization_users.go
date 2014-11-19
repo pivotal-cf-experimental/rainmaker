@@ -6,11 +6,23 @@ import (
 )
 
 func (fake *CloudController) GetOrganizationUsers(w http.ResponseWriter, req *http.Request) {
-	userGUIDs := []string{"user-123", "user-456"}
+	err := req.ParseForm()
+	if err != nil {
+		panic(err)
+	}
+
+	pageNumber := req.Form.Get("page")
+
+	var userGUIDs []string
+	if pageNumber == "" {
+		userGUIDs = []string{"user-123", "user-456"}
+	} else {
+		userGUIDs = []string{"user-next"}
+	}
 
 	document := map[string]interface{}{
-		"total_results": 2,
-		"total_pages":   1,
+		"total_results": 3,
+		"total_pages":   2,
 		"prev_url":      nil,
 		"next_url":      nil,
 		"resources":     make([]map[string]interface{}, 0),

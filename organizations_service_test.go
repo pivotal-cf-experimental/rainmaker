@@ -56,8 +56,8 @@ var _ = Describe("OrganizationsService", func() {
 		It("returns the users belonging to the organization", func() {
 			usersList, err := service.ListUsers("org-001", "token-456")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(usersList.TotalResults).To(Equal(2))
-			Expect(usersList.TotalPages).To(Equal(1))
+			Expect(usersList.TotalResults).To(Equal(3))
+			Expect(usersList.TotalPages).To(Equal(2))
 			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-11T18:22:51+00:00")
 			if err != nil {
 				panic(err)
