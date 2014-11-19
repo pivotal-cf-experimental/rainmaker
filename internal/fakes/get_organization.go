@@ -3,10 +3,28 @@ package fakes
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 func (fake *CloudController) GetOrganization(w http.ResponseWriter, req *http.Request) {
 	organizationGUID := "org-001"
+
+	requestedOrganizationGUID := strings.TrimPrefix(req.URL.Path, "/v2/organizations/")
+	if requestedOrganizationGUID != organizationGUID {
+		errorBody, err := json.Marshal(map[string]interface{}{
+			"code":        10000,
+			"description": "Unknown request",
+			"error_code":  "CF-NotFound",
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+		w.Write(errorBody)
+		return
+	}
+
 	organizationName := "rainmaker-organization"
 	quotaDefinitionGUID := "quota-definition-guid"
 	billingEnabled := false

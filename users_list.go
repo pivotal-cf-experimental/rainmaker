@@ -11,6 +11,7 @@ type UsersList struct {
 	TotalResults int
 	TotalPages   int
 	NextURL      string
+	PrevURL      string
 	Users        []User
 }
 
@@ -24,6 +25,8 @@ func NewUsersListFromResponse(config Config, response documents.UsersListRespons
 	list := NewUsersList(config)
 	list.TotalResults = response.TotalResults
 	list.TotalPages = response.TotalPages
+	list.PrevURL = response.PrevURL
+	list.NextURL = response.NextURL
 	list.Users = make([]User, 0)
 
 	for _, userResponse := range response.Resources {
@@ -54,4 +57,12 @@ func FetchUsersList(config Config, path, token string) (UsersList, error) {
 
 func (list UsersList) Next(token string) (UsersList, error) {
 	return FetchUsersList(list.config, list.NextURL, token)
+}
+
+func (list UsersList) HasNextPage() bool {
+	return list.NextURL != ""
+}
+
+func (list UsersList) HasPrevPage() bool {
+	return list.PrevURL != ""
 }

@@ -50,6 +50,14 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 		return 0, []byte{}, NewResponseReadError(err)
 	}
 
+	if response.StatusCode == 404 {
+		return 0, []byte{}, NewNotFoundError(responseBody)
+	}
+
+	if response.StatusCode == 401 {
+		return 0, []byte{}, NewUnauthorizedError(responseBody)
+	}
+
 	return response.StatusCode, responseBody, nil
 }
 

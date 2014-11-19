@@ -1,5 +1,35 @@
 package rainmaker
 
+import "fmt"
+
+type UnauthorizedError struct {
+	message []byte
+}
+
+func NewUnauthorizedError(message []byte) UnauthorizedError {
+	return UnauthorizedError{
+		message: message,
+	}
+}
+
+func (err UnauthorizedError) Error() string {
+	return fmt.Sprintf("Rainmaker UnauthorizedError: %s", err.message)
+}
+
+type NotFoundError struct {
+	message []byte
+}
+
+func NewNotFoundError(message []byte) NotFoundError {
+	return NotFoundError{
+		message: message,
+	}
+}
+
+func (err NotFoundError) Error() string {
+	return fmt.Sprintf("Rainmaker NotFoundError: %s", err.message)
+}
+
 type ResponseReadError struct {
 	internalError error
 }

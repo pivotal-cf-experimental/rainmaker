@@ -23,8 +23,8 @@ func (fake *CloudController) GetOrganizationUsers(w http.ResponseWriter, req *ht
 	document := map[string]interface{}{
 		"total_results": 3,
 		"total_pages":   2,
-		"prev_url":      nil,
-		"next_url":      nil,
+		"prev_url":      req.URL.Path + "?page=1",
+		"next_url":      req.URL.Path + "?page=2",
 		"resources":     make([]map[string]interface{}, 0),
 	}
 
