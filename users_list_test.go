@@ -11,13 +11,14 @@ import (
 
 var _ = Describe("UsersList", func() {
 	Describe("Next", func() {
+		var config rainmaker.Config
 		var list rainmaker.UsersList
 
 		BeforeEach(func() {
-			client := rainmaker.NewClient(rainmaker.Config{
+			config = rainmaker.Config{
 				Host: fakeCloudController.URL(),
-			})
-			list = rainmaker.NewUsersList(client)
+			}
+			list = rainmaker.NewUsersList(config)
 		})
 
 		It("returns the next UserList result for the paginated set", func() {

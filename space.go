@@ -1,12 +1,14 @@
 package rainmaker
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/pivotal-golang/rainmaker/internal/documents"
 )
 
 type Space struct {
+	config                   Config
 	GUID                     string
 	URL                      string
 	CreatedAt                time.Time
@@ -27,7 +29,14 @@ type Space struct {
 	SecurityGroupsURL        string
 }
 
-func NewSpaceFromResponse(response documents.SpaceResponse) Space {
+func NewSpace(config Config) Space {
+	return Space{
+		config: config,
+	}
+}
+
+func NewSpaceFromResponse(config Config, response documents.SpaceResponse) Space {
+	space := NewSpace(config)
 	if response.Metadata.CreatedAt == nil {
 		response.Metadata.CreatedAt = &time.Time{}
 	}
@@ -36,24 +45,43 @@ func NewSpaceFromResponse(response documents.SpaceResponse) Space {
 		response.Metadata.UpdatedAt = &time.Time{}
 	}
 
-	return Space{
-		GUID:                     response.Metadata.GUID,
-		URL:                      response.Metadata.URL,
-		CreatedAt:                *response.Metadata.CreatedAt,
-		UpdatedAt:                *response.Metadata.UpdatedAt,
-		Name:                     response.Entity.Name,
-		OrganizationGUID:         response.Entity.OrganizationGUID,
-		SpaceQuotaDefinitionGUID: response.Entity.SpaceQuotaDefinitionGUID,
-		OrganizationURL:          response.Entity.OrganizationURL,
-		DevelopersURL:            response.Entity.DevelopersURL,
-		ManagersURL:              response.Entity.ManagersURL,
-		AuditorsURL:              response.Entity.AuditorsURL,
-		AppsURL:                  response.Entity.AppsURL,
-		RoutesURL:                response.Entity.RoutesURL,
-		DomainsURL:               response.Entity.DomainsURL,
-		ServiceInstancesURL:      response.Entity.ServiceInstancesURL,
-		AppEventsURL:             response.Entity.AppEventsURL,
-		EventsURL:                response.Entity.EventsURL,
-		SecurityGroupsURL:        response.Entity.SecurityGroupsURL,
+	space.GUID = response.Metadata.GUID
+	space.URL = response.Metadata.URL
+	space.CreatedAt = *response.Metadata.CreatedAt
+	space.UpdatedAt = *response.Metadata.UpdatedAt
+	space.Name = response.Entity.Name
+	space.OrganizationGUID = response.Entity.OrganizationGUID
+	space.SpaceQuotaDefinitionGUID = response.Entity.SpaceQuotaDefinitionGUID
+	space.OrganizationURL = response.Entity.OrganizationURL
+	space.DevelopersURL = response.Entity.DevelopersURL
+	space.ManagersURL = response.Entity.ManagersURL
+	space.AuditorsURL = response.Entity.AuditorsURL
+	space.AppsURL = response.Entity.AppsURL
+	space.RoutesURL = response.Entity.RoutesURL
+	space.DomainsURL = response.Entity.DomainsURL
+	space.ServiceInstancesURL = response.Entity.ServiceInstancesURL
+	space.AppEventsURL = response.Entity.AppEventsURL
+	space.EventsURL = response.Entity.EventsURL
+	space.SecurityGroupsURL = response.Entity.SecurityGroupsURL
+
+	return space
+}
+
+func FetchSpace(config Config, path, token string) (Space, error) {
+	_, body, err := NewClient(config).makeRequest(requestArguments{
+		Method: "GET",
+		Path:   path,
+		Token:  token,
+	})
+	if err != nil {
+		return Space{}, err
 	}
+
+	var response documents.SpaceResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return Space{}, err
+	}
+
+	return NewSpaceFromResponse(config, response), nil
 }

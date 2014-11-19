@@ -7,25 +7,34 @@ import (
 )
 
 type UsersList struct {
+	config       Config
 	TotalResults int
 	TotalPages   int
 	NextURL      string
-	client       Client
 	Users        []User
 }
 
-func NewUsersList(client Client) UsersList {
+func NewUsersList(config Config) UsersList {
 	return UsersList{
-		client: client,
+		config: config,
 	}
 }
 
-func (list UsersList) Next(token string) (UsersList, error) {
-	return FetchUsersList(list.client, list.NextURL, token)
+func NewUsersListFromResponse(config Config, response documents.UsersListResponse) UsersList {
+	list := NewUsersList(config)
+	list.TotalResults = response.TotalResults
+	list.TotalPages = response.TotalPages
+	list.Users = make([]User, 0)
+
+	for _, userResponse := range response.Resources {
+		list.Users = append(list.Users, NewUserFromResponse(userResponse))
+	}
+
+	return list
 }
 
-func FetchUsersList(client Client, path, token string) (UsersList, error) {
-	_, body, err := client.makeRequest(requestArguments{
+func FetchUsersList(config Config, path, token string) (UsersList, error) {
+	_, body, err := NewClient(config).makeRequest(requestArguments{
 		Method: "GET",
 		Path:   path,
 		Token:  token,
@@ -40,19 +49,9 @@ func FetchUsersList(client Client, path, token string) (UsersList, error) {
 		return UsersList{}, err
 	}
 
-	return NewUsersListFromResponse(response), nil
+	return NewUsersListFromResponse(config, response), nil
 }
 
-func NewUsersListFromResponse(response documents.UsersListResponse) UsersList {
-	list := UsersList{
-		TotalResults: response.TotalResults,
-		TotalPages:   response.TotalPages,
-		Users:        make([]User, 0),
-	}
-
-	for _, userResponse := range response.Resources {
-		list.Users = append(list.Users, NewUserFromResponse(userResponse))
-	}
-
-	return list
+func (list UsersList) Next(token string) (UsersList, error) {
+	return FetchUsersList(list.config, list.NextURL, token)
 }

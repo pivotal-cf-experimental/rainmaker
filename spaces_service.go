@@ -1,55 +1,19 @@
 package rainmaker
 
-import (
-	"encoding/json"
-
-	"github.com/pivotal-golang/rainmaker/internal/documents"
-)
-
 type SpacesService struct {
-	client Client
+	config Config
 }
 
-func NewSpacesService(client Client) *SpacesService {
+func NewSpacesService(config Config) *SpacesService {
 	return &SpacesService{
-		client: client,
+		config: config,
 	}
 }
 
 func (service SpacesService) Get(guid, token string) (Space, error) {
-	_, body, err := service.client.makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/spaces/" + guid,
-		Token:  token,
-	})
-	if err != nil {
-		return Space{}, err
-	}
-
-	var response documents.SpaceResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return Space{}, err
-	}
-
-	return NewSpaceFromResponse(response), nil
+	return FetchSpace(service.config, "/v2/spaces/"+guid, token)
 }
 
 func (service SpacesService) ListUsers(guid, token string) (UsersList, error) {
-	_, body, err := service.client.makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/users?q=space_guid:" + guid,
-		Token:  token,
-	})
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	var response documents.UsersListResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	return NewUsersListFromResponse(response), nil
+	return FetchUsersList(service.config, "/v2/users?q=space_guid:"+guid, token)
 }

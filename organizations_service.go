@@ -1,112 +1,31 @@
 package rainmaker
 
-import (
-	"encoding/json"
-
-	"github.com/pivotal-golang/rainmaker/internal/documents"
-)
-
 type OrganizationsService struct {
-	client Client
+	config Config
 }
 
-func NewOrganizationsService(client Client) *OrganizationsService {
+func NewOrganizationsService(config Config) *OrganizationsService {
 	return &OrganizationsService{
-		client: client,
+		config: config,
 	}
 }
 
 func (service OrganizationsService) Get(guid, token string) (Organization, error) {
-	_, body, err := service.client.makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/organizations/" + guid,
-		Token:  token,
-	})
-	if err != nil {
-		return Organization{}, err
-	}
-
-	var response documents.OrganizationResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return Organization{}, err
-	}
-
-	return NewOrganizationFromResponse(response), nil
+	return FetchOrganization(service.config, "/v2/organizations/"+guid, token)
 }
 
 func (service OrganizationsService) ListUsers(guid, token string) (UsersList, error) {
-	_, body, err := service.client.makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/organizations/" + guid + "/users",
-		Token:  token,
-	})
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	var response documents.UsersListResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	return NewUsersListFromResponse(response), nil
+	return FetchUsersList(service.config, "/v2/organizations/"+guid+"/users", token)
 }
 
 func (service OrganizationsService) ListBillingManagers(guid, token string) (UsersList, error) {
-	_, body, err := service.client.makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/organizations/" + guid + "/billing_managers",
-		Token:  token,
-	})
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	var response documents.UsersListResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	return NewUsersListFromResponse(response), nil
+	return FetchUsersList(service.config, "/v2/organizations/"+guid+"/billing_managers", token)
 }
 
 func (service OrganizationsService) ListAuditors(guid, token string) (UsersList, error) {
-	_, body, err := service.client.makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/organizations/" + guid + "/auditors",
-		Token:  token,
-	})
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	var response documents.UsersListResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	return NewUsersListFromResponse(response), nil
+	return FetchUsersList(service.config, "/v2/organizations/"+guid+"/auditors", token)
 }
 
 func (service OrganizationsService) ListManagers(guid, token string) (UsersList, error) {
-	_, body, err := service.client.makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/organizations/" + guid + "/managers",
-		Token:  token,
-	})
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	var response documents.UsersListResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return UsersList{}, err
-	}
-
-	return NewUsersListFromResponse(response), nil
+	return FetchUsersList(service.config, "/v2/organizations/"+guid+"/managers", token)
 }

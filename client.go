@@ -20,8 +20,8 @@ func NewClient(config Config) Client {
 		Config: config,
 	}
 
-	client.Organizations = NewOrganizationsService(client)
-	client.Spaces = NewSpacesService(client)
+	client.Organizations = NewOrganizationsService(config)
+	client.Spaces = NewSpacesService(config)
 
 	return client
 }

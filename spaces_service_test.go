@@ -10,13 +10,14 @@ import (
 )
 
 var _ = Describe("SpacesService", func() {
+	var config rainmaker.Config
 	var service *rainmaker.SpacesService
 
 	BeforeEach(func() {
-		client := rainmaker.NewClient(rainmaker.Config{
+		config = rainmaker.Config{
 			Host: fakeCloudController.URL(),
-		})
-		service = rainmaker.NewSpacesService(client)
+		}
+		service = rainmaker.NewSpacesService(config)
 	})
 
 	Describe("Get", func() {
@@ -28,26 +29,27 @@ var _ = Describe("SpacesService", func() {
 				panic(err)
 			}
 
-			Expect(space).To(Equal(rainmaker.Space{
-				GUID:                     "space-001",
-				URL:                      "/v2/spaces/space-001",
-				CreatedAt:                createdAt,
-				UpdatedAt:                time.Time{},
-				Name:                     "development",
-				OrganizationGUID:         "org-001",
-				SpaceQuotaDefinitionGUID: "",
-				OrganizationURL:          "/v2/organizations/org-001",
-				DevelopersURL:            "/v2/spaces/space-001/developers",
-				ManagersURL:              "/v2/spaces/space-001/managers",
-				AuditorsURL:              "/v2/spaces/space-001/auditors",
-				AppsURL:                  "/v2/spaces/space-001/apps",
-				RoutesURL:                "/v2/spaces/space-001/routes",
-				DomainsURL:               "/v2/spaces/space-001/domains",
-				ServiceInstancesURL:      "/v2/spaces/space-001/service_instances",
-				AppEventsURL:             "/v2/spaces/space-001/app_events",
-				EventsURL:                "/v2/spaces/space-001/events",
-				SecurityGroupsURL:        "/v2/spaces/space-001/security_groups",
-			}))
+			expectedSpace := rainmaker.NewSpace(config)
+			expectedSpace.GUID = "space-001"
+			expectedSpace.URL = "/v2/spaces/space-001"
+			expectedSpace.CreatedAt = createdAt
+			expectedSpace.UpdatedAt = time.Time{}
+			expectedSpace.Name = "development"
+			expectedSpace.OrganizationGUID = "org-001"
+			expectedSpace.SpaceQuotaDefinitionGUID = ""
+			expectedSpace.OrganizationURL = "/v2/organizations/org-001"
+			expectedSpace.DevelopersURL = "/v2/spaces/space-001/developers"
+			expectedSpace.ManagersURL = "/v2/spaces/space-001/managers"
+			expectedSpace.AuditorsURL = "/v2/spaces/space-001/auditors"
+			expectedSpace.AppsURL = "/v2/spaces/space-001/apps"
+			expectedSpace.RoutesURL = "/v2/spaces/space-001/routes"
+			expectedSpace.DomainsURL = "/v2/spaces/space-001/domains"
+			expectedSpace.ServiceInstancesURL = "/v2/spaces/space-001/service_instances"
+			expectedSpace.AppEventsURL = "/v2/spaces/space-001/app_events"
+			expectedSpace.EventsURL = "/v2/spaces/space-001/events"
+			expectedSpace.SecurityGroupsURL = "/v2/spaces/space-001/security_groups"
+
+			Expect(space).To(Equal(expectedSpace))
 		})
 	})
 

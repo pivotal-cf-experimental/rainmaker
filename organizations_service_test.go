@@ -10,12 +10,14 @@ import (
 )
 
 var _ = Describe("OrganizationsService", func() {
+	var config rainmaker.Config
 	var service *rainmaker.OrganizationsService
 
 	BeforeEach(func() {
-		client := rainmaker.NewClient(rainmaker.Config{
+		config = rainmaker.Config{
 			Host: fakeCloudController.URL(),
-		})
+		}
+		client := rainmaker.NewClient(config)
 		service = client.Organizations
 	})
 
@@ -29,26 +31,27 @@ var _ = Describe("OrganizationsService", func() {
 			organization, err := service.Get("org-001", "token-123")
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(organization).To(Equal(rainmaker.Organization{
-				GUID:                     "org-001",
-				Name:                     "rainmaker-organization",
-				URL:                      "/v2/organizations/org-001",
-				BillingEnabled:           false,
-				Status:                   "active",
-				QuotaDefinitionGUID:      "quota-definition-guid",
-				QuotaDefinitionURL:       "/v2/quota_definitions/quota-definition-guid",
-				SpacesURL:                "/v2/organizations/org-001/spaces",
-				DomainsURL:               "/v2/organizations/org-001/domains",
-				PrivateDomainsURL:        "/v2/organizations/org-001/private_domains",
-				UsersURL:                 "/v2/organizations/org-001/users",
-				ManagersURL:              "/v2/organizations/org-001/managers",
-				BillingManagersURL:       "/v2/organizations/org-001/billing_managers",
-				AuditorsURL:              "/v2/organizations/org-001/auditors",
-				AppEventsURL:             "/v2/organizations/org-001/app_events",
-				SpaceQuotaDefinitionsURL: "/v2/organizations/org-001/space_quota_definitions",
-				CreatedAt:                createdAt,
-				UpdatedAt:                time.Time{},
-			}))
+			expectedOrganization := rainmaker.NewOrganization(config)
+			expectedOrganization.GUID = "org-001"
+			expectedOrganization.Name = "rainmaker-organization"
+			expectedOrganization.URL = "/v2/organizations/org-001"
+			expectedOrganization.BillingEnabled = false
+			expectedOrganization.Status = "active"
+			expectedOrganization.QuotaDefinitionGUID = "quota-definition-guid"
+			expectedOrganization.QuotaDefinitionURL = "/v2/quota_definitions/quota-definition-guid"
+			expectedOrganization.SpacesURL = "/v2/organizations/org-001/spaces"
+			expectedOrganization.DomainsURL = "/v2/organizations/org-001/domains"
+			expectedOrganization.PrivateDomainsURL = "/v2/organizations/org-001/private_domains"
+			expectedOrganization.UsersURL = "/v2/organizations/org-001/users"
+			expectedOrganization.ManagersURL = "/v2/organizations/org-001/managers"
+			expectedOrganization.BillingManagersURL = "/v2/organizations/org-001/billing_managers"
+			expectedOrganization.AuditorsURL = "/v2/organizations/org-001/auditors"
+			expectedOrganization.AppEventsURL = "/v2/organizations/org-001/app_events"
+			expectedOrganization.SpaceQuotaDefinitionsURL = "/v2/organizations/org-001/space_quota_definitions"
+			expectedOrganization.CreatedAt = createdAt
+			expectedOrganization.UpdatedAt = time.Time{}
+
+			Expect(organization).To(Equal(expectedOrganization))
 		})
 	})
 

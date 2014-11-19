@@ -1,12 +1,14 @@
 package rainmaker
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/pivotal-golang/rainmaker/internal/documents"
 )
 
 type Organization struct {
+	config                   Config
 	GUID                     string
 	Name                     string
 	URL                      string
@@ -27,7 +29,13 @@ type Organization struct {
 	UpdatedAt                time.Time
 }
 
-func NewOrganizationFromResponse(response documents.OrganizationResponse) Organization {
+func NewOrganization(config Config) Organization {
+	return Organization{
+		config: config,
+	}
+}
+
+func NewOrganizationFromResponse(config Config, response documents.OrganizationResponse) Organization {
 	if response.Metadata.CreatedAt == nil {
 		response.Metadata.CreatedAt = &time.Time{}
 	}
@@ -36,24 +44,44 @@ func NewOrganizationFromResponse(response documents.OrganizationResponse) Organi
 		response.Metadata.UpdatedAt = &time.Time{}
 	}
 
-	return Organization{
-		GUID:                     response.Metadata.GUID,
-		URL:                      response.Metadata.URL,
-		CreatedAt:                *response.Metadata.CreatedAt,
-		UpdatedAt:                *response.Metadata.UpdatedAt,
-		Name:                     response.Entity.Name,
-		BillingEnabled:           response.Entity.BillingEnabled,
-		Status:                   response.Entity.Status,
-		QuotaDefinitionGUID:      response.Entity.QuotaDefinitionGUID,
-		QuotaDefinitionURL:       response.Entity.QuotaDefinitionURL,
-		SpacesURL:                response.Entity.SpacesURL,
-		DomainsURL:               response.Entity.DomainsURL,
-		PrivateDomainsURL:        response.Entity.PrivateDomainsURL,
-		UsersURL:                 response.Entity.UsersURL,
-		ManagersURL:              response.Entity.ManagersURL,
-		BillingManagersURL:       response.Entity.BillingManagersURL,
-		AuditorsURL:              response.Entity.AuditorsURL,
-		AppEventsURL:             response.Entity.AppEventsURL,
-		SpaceQuotaDefinitionsURL: response.Entity.SpaceQuotaDefinitionsURL,
+	organization := NewOrganization(config)
+	organization.GUID = response.Metadata.GUID
+	organization.URL = response.Metadata.URL
+	organization.CreatedAt = *response.Metadata.CreatedAt
+	organization.UpdatedAt = *response.Metadata.UpdatedAt
+	organization.Name = response.Entity.Name
+	organization.BillingEnabled = response.Entity.BillingEnabled
+	organization.Status = response.Entity.Status
+	organization.QuotaDefinitionGUID = response.Entity.QuotaDefinitionGUID
+	organization.QuotaDefinitionURL = response.Entity.QuotaDefinitionURL
+	organization.SpacesURL = response.Entity.SpacesURL
+	organization.DomainsURL = response.Entity.DomainsURL
+	organization.PrivateDomainsURL = response.Entity.PrivateDomainsURL
+	organization.UsersURL = response.Entity.UsersURL
+	organization.ManagersURL = response.Entity.ManagersURL
+	organization.BillingManagersURL = response.Entity.BillingManagersURL
+	organization.AuditorsURL = response.Entity.AuditorsURL
+	organization.AppEventsURL = response.Entity.AppEventsURL
+	organization.SpaceQuotaDefinitionsURL = response.Entity.SpaceQuotaDefinitionsURL
+
+	return organization
+}
+
+func FetchOrganization(config Config, path, token string) (Organization, error) {
+	_, body, err := NewClient(config).makeRequest(requestArguments{
+		Method: "GET",
+		Path:   path,
+		Token:  token,
+	})
+	if err != nil {
+		return Organization{}, err
 	}
+
+	var response documents.OrganizationResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return Organization{}, err
+	}
+
+	return NewOrganizationFromResponse(config, response), nil
 }
