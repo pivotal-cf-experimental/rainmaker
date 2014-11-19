@@ -23,13 +23,13 @@ func (service OrganizationsService) Get(guid, token string) (Organization, error
 		Token:  token,
 	})
 	if err != nil {
-		panic(err)
+		return Organization{}, err
 	}
 
 	var response documents.OrganizationResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		panic(err)
+		return Organization{}, err
 	}
 
 	return NewOrganizationFromResponse(response), nil
@@ -42,13 +42,13 @@ func (service OrganizationsService) ListUsers(guid, token string) (UsersList, er
 		Token:  token,
 	})
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	var response documents.UsersListResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	return NewUsersListFromResponse(response), nil
@@ -61,13 +61,13 @@ func (service OrganizationsService) ListBillingManagers(guid, token string) (Use
 		Token:  token,
 	})
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	var response documents.UsersListResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	return NewUsersListFromResponse(response), nil
@@ -80,13 +80,13 @@ func (service OrganizationsService) ListAuditors(guid, token string) (UsersList,
 		Token:  token,
 	})
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	var response documents.UsersListResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	return NewUsersListFromResponse(response), nil
@@ -99,13 +99,13 @@ func (service OrganizationsService) ListManagers(guid, token string) (UsersList,
 		Token:  token,
 	})
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	var response documents.UsersListResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	return NewUsersListFromResponse(response), nil

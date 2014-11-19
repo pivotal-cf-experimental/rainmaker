@@ -23,13 +23,13 @@ func (service SpacesService) Get(guid, token string) (Space, error) {
 		Token:  token,
 	})
 	if err != nil {
-		panic(err)
+		return Space{}, err
 	}
 
 	var response documents.SpaceResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		panic(err)
+		return Space{}, err
 	}
 
 	return NewSpaceFromResponse(response), nil
@@ -42,13 +42,13 @@ func (service SpacesService) ListUsers(guid, token string) (UsersList, error) {
 		Token:  token,
 	})
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	var response documents.UsersListResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		panic(err)
+		return UsersList{}, err
 	}
 
 	return NewUsersListFromResponse(response), nil
