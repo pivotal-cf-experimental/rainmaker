@@ -13,22 +13,40 @@ func (fake *CloudController) GetOrganizationUsers(w http.ResponseWriter, req *ht
 
 	pageNumber := req.Form.Get("page")
 
-	var userGUIDs []string
-	if pageNumber == "" {
-		userGUIDs = []string{"user-123", "user-456"}
-	} else {
-		userGUIDs = []string{"user-next"}
+	var page Page
+	var nextURL, prevURL string
+
+	switch pageNumber {
+	case "", "1":
+		page = Page{
+			Number: 1,
+			GUIDs:  []string{"user-123", "user-456"},
+		}
+		nextURL = req.URL.Path + "?page=2"
+	case "2":
+		page = Page{
+			Number: 2,
+			GUIDs:  []string{"user-next"},
+		}
+		prevURL = req.URL.Path + "?page=1"
+		nextURL = req.URL.Path + "?page=3"
+	case "3":
+		page = Page{
+			Number: 3,
+			GUIDs:  []string{"user-last"},
+		}
+		prevURL = req.URL.Path + "?page=2"
 	}
 
 	document := map[string]interface{}{
-		"total_results": 3,
-		"total_pages":   2,
-		"prev_url":      req.URL.Path + "?page=1",
-		"next_url":      req.URL.Path + "?page=2",
+		"total_results": 4,
+		"total_pages":   3,
+		"prev_url":      prevURL,
+		"next_url":      nextURL,
 		"resources":     make([]map[string]interface{}, 0),
 	}
 
-	for _, userGUID := range userGUIDs {
+	for _, userGUID := range page.GUIDs {
 		document["resources"] = append(document["resources"].([]map[string]interface{}), map[string]interface{}{
 			"metadata": map[string]interface{}{
 				"guid":       userGUID,
@@ -58,4 +76,9 @@ func (fake *CloudController) GetOrganizationUsers(w http.ResponseWriter, req *ht
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
+}
+
+type Page struct {
+	Number int
+	GUIDs  []string
 }
