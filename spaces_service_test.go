@@ -2,6 +2,7 @@ package rainmaker_test
 
 import (
 	"github.com/pivotal-golang/rainmaker"
+	"github.com/pivotal-golang/rainmaker/internal/fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -19,6 +20,12 @@ var _ = Describe("SpacesService", func() {
 	})
 
 	Describe("Get", func() {
+		BeforeEach(func() {
+			fakeCloudController.Spaces.Add(fakes.Space{
+				GUID: "space-001",
+			})
+		})
+
 		It("returns the space matching the given GUID", func() {
 			space, err := service.Get("space-001", "token-asd")
 			Expect(err).NotTo(HaveOccurred())

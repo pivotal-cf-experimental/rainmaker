@@ -9,11 +9,17 @@ import (
 )
 
 type CloudController struct {
-	server *httptest.Server
+	server        *httptest.Server
+	Organizations Organizations
+	Spaces        Spaces
 }
 
 func NewCloudController() *CloudController {
-	fake := &CloudController{}
+	fake := &CloudController{
+		Organizations: NewOrganizations(),
+		Spaces:        NewSpaces(),
+	}
+
 	router := mux.NewRouter()
 	router.HandleFunc("/v2/organizations/{guid}", fake.GetOrganization).Methods("GET")
 	router.HandleFunc("/v2/organizations/{guid}/users", fake.GetOrganizationUsers).Methods("GET")
@@ -38,6 +44,10 @@ func (fake *CloudController) Close() {
 
 func (fake *CloudController) URL() string {
 	return fake.server.URL
+}
+
+func (fake *CloudController) Reset() {
+	fake.Organizations.Clear()
 }
 
 func (fake *CloudController) RequireToken(handler http.Handler) http.Handler {

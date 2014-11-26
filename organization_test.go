@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/pivotal-golang/rainmaker"
+	"github.com/pivotal-golang/rainmaker/internal/fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,18 +21,27 @@ var _ = Describe("Organization", func() {
 		})
 
 		It("retrieves the organization", func() {
+			createdAt := time.Now().Add(-10 * time.Minute).UTC()
+			updatedAt := time.Now().Add(-2 * time.Minute).UTC()
+
+			fakeCloudController.Organizations.Add(fakes.Organization{
+				GUID:                "org-001",
+				Name:                "rainmaker-organization",
+				Status:              "active",
+				BillingEnabled:      true,
+				QuotaDefinitionGUID: "quota-definition-guid",
+				CreatedAt:           createdAt,
+				UpdatedAt:           updatedAt,
+			})
+
 			organization, err := rainmaker.FetchOrganization(config, "/v2/organizations/org-001", "token-123")
 			Expect(err).NotTo(HaveOccurred())
 
-			createdAt, err := time.Parse(time.RFC3339, "2014-11-11T18:34:16+00:00")
-			if err != nil {
-				panic(err)
-			}
 			expectedOrganization := rainmaker.NewOrganization(config)
 			expectedOrganization.GUID = "org-001"
 			expectedOrganization.Name = "rainmaker-organization"
 			expectedOrganization.URL = "/v2/organizations/org-001"
-			expectedOrganization.BillingEnabled = false
+			expectedOrganization.BillingEnabled = true
 			expectedOrganization.Status = "active"
 			expectedOrganization.QuotaDefinitionGUID = "quota-definition-guid"
 			expectedOrganization.QuotaDefinitionURL = "/v2/quota_definitions/quota-definition-guid"
@@ -45,7 +55,7 @@ var _ = Describe("Organization", func() {
 			expectedOrganization.AppEventsURL = "/v2/organizations/org-001/app_events"
 			expectedOrganization.SpaceQuotaDefinitionsURL = "/v2/organizations/org-001/space_quota_definitions"
 			expectedOrganization.CreatedAt = createdAt
-			expectedOrganization.UpdatedAt = time.Time{}
+			expectedOrganization.UpdatedAt = updatedAt
 
 			Expect(organization).To(Equal(expectedOrganization))
 		})

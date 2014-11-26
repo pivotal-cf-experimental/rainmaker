@@ -2,6 +2,7 @@ package rainmaker_test
 
 import (
 	"github.com/pivotal-golang/rainmaker"
+	"github.com/pivotal-golang/rainmaker/internal/fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,6 +21,12 @@ var _ = Describe("OrganizationsService", func() {
 	})
 
 	Describe("Get", func() {
+		BeforeEach(func() {
+			fakeCloudController.Organizations.Add(fakes.Organization{
+				GUID: "org-001",
+			})
+		})
+
 		It("returns the organization matching the given GUID", func() {
 			organization, err := service.Get("org-001", "token-123")
 			Expect(err).NotTo(HaveOccurred())
