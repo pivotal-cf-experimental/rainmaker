@@ -13,7 +13,7 @@ type Space struct {
 	UpdatedAt        time.Time
 }
 
-func (space Space) ToJSON() ([]byte, error) {
+func (space Space) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"metadata": map[string]interface{}{
 			"guid":       space.GUID,

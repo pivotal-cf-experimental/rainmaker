@@ -15,7 +15,7 @@ type Organization struct {
 	UpdatedAt           time.Time
 }
 
-func (org Organization) ToJSON() ([]byte, error) {
+func (org Organization) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"metadata": map[string]interface{}{
 			"guid":       org.GUID,

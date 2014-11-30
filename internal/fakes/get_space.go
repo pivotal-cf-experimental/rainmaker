@@ -14,7 +14,7 @@ func (fake *CloudController) GetSpace(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	response, err := space.ToJSON()
+	response, err := space.MarshalJSON()
 	if err != nil {
 		panic(err)
 	}

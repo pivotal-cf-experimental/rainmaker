@@ -14,7 +14,7 @@ func (fake *CloudController) GetOrganization(w http.ResponseWriter, req *http.Re
 		return
 	}
 
-	response, err := organization.ToJSON()
+	response, err := organization.MarshalJSON()
 	if err != nil {
 		panic(err)
 	}
