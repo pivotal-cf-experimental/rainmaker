@@ -1,6 +1,7 @@
 package fakes
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 )
@@ -14,7 +15,7 @@ func (fake *CloudController) GetOrganization(w http.ResponseWriter, req *http.Re
 		return
 	}
 
-	response, err := organization.MarshalJSON()
+	response, err := json.Marshal(organization)
 	if err != nil {
 		panic(err)
 	}

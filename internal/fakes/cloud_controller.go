@@ -10,24 +10,34 @@ import (
 
 type CloudController struct {
 	server        *httptest.Server
-	Organizations Organizations
-	Spaces        Spaces
+	Organizations *Organizations
+	Spaces        *Spaces
+	Users         *Users
 }
 
 func NewCloudController() *CloudController {
 	fake := &CloudController{
 		Organizations: NewOrganizations(),
 		Spaces:        NewSpaces(),
+		Users:         NewUsers(),
 	}
 
 	router := mux.NewRouter()
+	router.HandleFunc("/v2/organizations", fake.CreateOrganization).Methods("POST")
 	router.HandleFunc("/v2/organizations/{guid}", fake.GetOrganization).Methods("GET")
 	router.HandleFunc("/v2/organizations/{guid}/users", fake.GetOrganizationUsers).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/users/{user_guid}", fake.AssociateUserToOrganization).Methods("PUT")
 	router.HandleFunc("/v2/organizations/{guid}/billing_managers", fake.GetOrganizationBillingManagers).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/billing_managers/{billing_manager_guid}", fake.AssociateBillingManagerToOrganization).Methods("PUT")
 	router.HandleFunc("/v2/organizations/{guid}/auditors", fake.GetOrganizationAuditors).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/auditors/{auditor_guid}", fake.AssociateAuditorToOrganization).Methods("PUT")
 	router.HandleFunc("/v2/organizations/{guid}/managers", fake.GetOrganizationManagers).Methods("GET")
+	router.HandleFunc("/v2/organizations/{guid}/managers/{manager_guid}", fake.AssociateManagerToOrganization).Methods("PUT")
 	router.HandleFunc("/v2/spaces/{guid}", fake.GetSpace).Methods("GET")
+	router.HandleFunc("/v2/spaces/{guid}/developers/{developer_guid}", fake.AssociateDeveloperToSpace).Methods("PUT")
+	router.HandleFunc("/v2/spaces/{guid}/developers", fake.GetSpaceDevelopers).Methods("GET")
 	router.HandleFunc("/v2/users", fake.GetUsers).Methods("GET")
+	router.HandleFunc("/v2/users", fake.CreateUser).Methods("POST")
 
 	handler := fake.RequireToken(router)
 	fake.server = httptest.NewUnstartedServer(handler)
@@ -48,6 +58,8 @@ func (fake *CloudController) URL() string {
 
 func (fake *CloudController) Reset() {
 	fake.Organizations.Clear()
+	fake.Spaces.Clear()
+	fake.Users.Clear()
 }
 
 func (fake *CloudController) RequireToken(handler http.Handler) http.Handler {

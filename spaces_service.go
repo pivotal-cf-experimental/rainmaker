@@ -1,5 +1,10 @@
 package rainmaker
 
+import (
+	"fmt"
+	"net/url"
+)
+
 type SpacesService struct {
 	config Config
 }
@@ -15,5 +20,8 @@ func (service SpacesService) Get(guid, token string) (Space, error) {
 }
 
 func (service SpacesService) ListUsers(guid, token string) (UsersList, error) {
-	return FetchUsersList(service.config, "/v2/users?q=space_guid:"+guid, token)
+	query := url.Values{}
+	query.Set("q", fmt.Sprintf("space_guid:%s", guid))
+
+	return FetchUsersList(service.config, NewRequestPlan("/v2/users", query), token)
 }

@@ -1,6 +1,7 @@
 package fakes
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 )
@@ -14,7 +15,7 @@ func (fake *CloudController) GetSpace(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	response, err := space.MarshalJSON()
+	response, err := json.Marshal(space)
 	if err != nil {
 		panic(err)
 	}

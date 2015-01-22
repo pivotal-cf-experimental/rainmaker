@@ -49,8 +49,7 @@ var _ = Describe("Space", func() {
 			space, err := rainmaker.FetchSpace(config, "/v2/spaces/space-001", "token-asd")
 			Expect(err).NotTo(HaveOccurred())
 
-			expectedSpace := rainmaker.NewSpace(config)
-			expectedSpace.GUID = "space-001"
+			expectedSpace := rainmaker.NewSpace(config, "space-001")
 			expectedSpace.URL = "/v2/spaces/space-001"
 			expectedSpace.CreatedAt = createdAt
 			expectedSpace.UpdatedAt = updatedAt

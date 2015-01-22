@@ -13,6 +13,20 @@ type Organization struct {
 	QuotaDefinitionGUID string
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
+	Users               *Users
+	BillingManagers     *Users
+	Auditors            *Users
+	Managers            *Users
+}
+
+func NewOrganization(guid string) Organization {
+	return Organization{
+		GUID:            guid,
+		Users:           NewUsers(),
+		BillingManagers: NewUsers(),
+		Auditors:        NewUsers(),
+		Managers:        NewUsers(),
+	}
 }
 
 func (org Organization) MarshalJSON() ([]byte, error) {

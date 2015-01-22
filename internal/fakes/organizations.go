@@ -4,8 +4,8 @@ type Organizations struct {
 	store map[string]Organization
 }
 
-func NewOrganizations() Organizations {
-	return Organizations{
+func NewOrganizations() *Organizations {
+	return &Organizations{
 		store: make(map[string]Organization),
 	}
 }

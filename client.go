@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/pivotal-golang/rainmaker/internal/network"
 )
@@ -27,12 +28,23 @@ func NewClient(config Config) Client {
 }
 
 func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, error) {
+	if requestArgs.AcceptableStatusCodes == nil {
+		panic("No acceptable status codes were assigned in the request arguments")
+	}
+
 	jsonBody, err := json.Marshal(requestArgs.Body)
 	if err != nil {
 		return 0, []byte{}, NewRequestBodyMarshalError(err)
 	}
 
-	request, err := http.NewRequest(requestArgs.Method, client.Config.Host+requestArgs.Path, bytes.NewBuffer(jsonBody))
+	requestURL, err := url.Parse(client.Config.Host)
+	if err != nil {
+		return 0, []byte{}, NewRequestConfigurationError(err)
+	}
+	requestURL.Path = requestArgs.Path
+	requestURL.RawQuery = requestArgs.Query.Encode()
+
+	request, err := http.NewRequest(requestArgs.Method, requestURL.String(), bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return 0, []byte{}, NewRequestConfigurationError(err)
 	}
@@ -58,7 +70,13 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 		return 0, []byte{}, NewUnauthorizedError(responseBody)
 	}
 
-	return response.StatusCode, responseBody, nil
+	for _, acceptableCode := range requestArgs.AcceptableStatusCodes {
+		if response.StatusCode == acceptableCode {
+			return response.StatusCode, responseBody, nil
+		}
+	}
+
+	return response.StatusCode, responseBody, NewUnexpectedStatusError(response.StatusCode, responseBody)
 }
 
 func (client Client) unmarshal(body []byte, response interface{}) error {
@@ -70,8 +88,10 @@ func (client Client) unmarshal(body []byte, response interface{}) error {
 }
 
 type requestArguments struct {
-	Method string
-	Path   string
-	Token  string
-	Body   interface{}
+	Method                string
+	Path                  string
+	Query                 url.Values
+	Token                 string
+	Body                  interface{}
+	AcceptableStatusCodes []int
 }

@@ -6,21 +6,21 @@ import (
 	"regexp"
 )
 
-func (fake *CloudController) GetOrganizationUsers(w http.ResponseWriter, req *http.Request) {
-	r := regexp.MustCompile(`^/v2/organizations/(.*)/users$`)
+func (fake *CloudController) GetSpaceDevelopers(w http.ResponseWriter, req *http.Request) {
+	r := regexp.MustCompile(`^/v2/spaces/(.*)/developers$`)
 	matches := r.FindStringSubmatch(req.URL.Path)
 
 	query := req.URL.Query()
 	pageNum := ParseInt(query.Get("page"), 1)
 	perPage := ParseInt(query.Get("results-per-page"), 10)
 
-	org, ok := fake.Organizations.Get(matches[1])
+	space, ok := fake.Spaces.Get(matches[1])
 	if !ok {
 		fake.NotFound(w)
 		return
 	}
 
-	page := NewPage(org.Users, req.URL.Path, pageNum, perPage)
+	page := NewPage(space.Developers, req.URL.Path, pageNum, perPage)
 	response, err := json.Marshal(page)
 	if err != nil {
 		panic(err)

@@ -2,12 +2,16 @@ package rainmaker
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/url"
+	"path"
 
 	"github.com/pivotal-golang/rainmaker/internal/documents"
 )
 
 type UsersList struct {
 	config       Config
+	plan         requestPlan
 	TotalResults int
 	TotalPages   int
 	NextURL      string
@@ -15,14 +19,15 @@ type UsersList struct {
 	Users        []User
 }
 
-func NewUsersList(config Config) UsersList {
+func NewUsersList(config Config, plan requestPlan) UsersList {
 	return UsersList{
 		config: config,
+		plan:   plan,
 	}
 }
 
-func NewUsersListFromResponse(config Config, response documents.UsersListResponse) UsersList {
-	list := NewUsersList(config)
+func NewUsersListFromResponse(config Config, plan requestPlan, response documents.UsersListResponse) UsersList {
+	list := NewUsersList(config, plan)
 	list.TotalResults = response.TotalResults
 	list.TotalPages = response.TotalPages
 	list.PrevURL = response.PrevURL
@@ -36,23 +41,16 @@ func NewUsersListFromResponse(config Config, response documents.UsersListRespons
 	return list
 }
 
-func FetchUsersList(config Config, path, token string) (UsersList, error) {
-	_, body, err := NewClient(config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   path,
-		Token:  token,
-	})
+func FetchUsersList(config Config, plan requestPlan, token string) (UsersList, error) {
+	list := NewUsersList(config, plan)
+
+	err := list.Fetch(token)
 	if err != nil {
-		return UsersList{}, err
+		return list, err
 	}
 
-	var response documents.UsersListResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return UsersList{}, err
-	}
+	return list, nil
 
-	return NewUsersListFromResponse(config, response), nil
 }
 
 func (list UsersList) HasNextPage() bool {
@@ -64,11 +62,21 @@ func (list UsersList) HasPrevPage() bool {
 }
 
 func (list UsersList) Next(token string) (UsersList, error) {
-	return FetchUsersList(list.config, list.NextURL, token)
+	nextURL, err := url.Parse("http://example.com" + list.NextURL)
+	if err != nil {
+		return UsersList{}, err
+	}
+
+	return FetchUsersList(list.config, NewRequestPlan(nextURL.Path, nextURL.Query()), token)
 }
 
 func (list UsersList) Prev(token string) (UsersList, error) {
-	return FetchUsersList(list.config, list.PrevURL, token)
+	prevURL, err := url.Parse("http://example.com" + list.PrevURL)
+	if err != nil {
+		return UsersList{}, err
+	}
+
+	return FetchUsersList(list.config, NewRequestPlan(prevURL.Path, prevURL.Query()), token)
 }
 
 func (list UsersList) AllUsers(token string) ([]User, error) {
@@ -98,4 +106,68 @@ func (list UsersList) AllUsers(token string) ([]User, error) {
 	}
 
 	return users, nil
+}
+
+func (list UsersList) Create(user User, token string) (User, error) {
+	var document documents.UserResponse
+
+	_, body, err := NewClient(list.config).makeRequest(requestArguments{
+		Method: "POST",
+		Path:   list.plan.Path,
+		Token:  token,
+		Body:   user,
+		AcceptableStatusCodes: []int{http.StatusCreated},
+	})
+	if err != nil {
+		return User{}, err
+	}
+
+	err = json.Unmarshal(body, &document)
+	if err != nil {
+		return User{}, err
+	}
+
+	return NewUserFromResponse(document), nil
+}
+
+func (list UsersList) Associate(userGUID, token string) error {
+	_, _, err := NewClient(list.config).makeRequest(requestArguments{
+		Method: "PUT",
+		Path:   path.Join(list.plan.Path, userGUID),
+		Token:  token,
+		AcceptableStatusCodes: []int{http.StatusCreated},
+	})
+
+	return err
+}
+
+func (list *UsersList) Fetch(token string) error {
+	_, body, err := NewClient(list.config).makeRequest(requestArguments{
+		Method: "GET",
+		Path:   list.plan.Path,
+		Query: url.Values{
+			"page":             list.plan.Query["page"],
+			"results-per-page": list.plan.Query["results-per-page"],
+		},
+		Token: token,
+		AcceptableStatusCodes: []int{http.StatusOK},
+	})
+	if err != nil {
+		return err
+	}
+
+	var response documents.UsersListResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return err
+	}
+
+	updatedList := NewUsersListFromResponse(list.config, list.plan, response)
+	list.TotalResults = updatedList.TotalResults
+	list.TotalPages = updatedList.TotalPages
+	list.NextURL = updatedList.NextURL
+	list.PrevURL = updatedList.PrevURL
+	list.Users = updatedList.Users
+
+	return nil
 }

@@ -1,9 +1,10 @@
 package rainmaker_test
 
 import (
-	"time"
+	"net/url"
 
 	"github.com/pivotal-golang/rainmaker"
+	"github.com/pivotal-golang/rainmaker/internal/fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,155 +12,180 @@ import (
 
 var _ = Describe("UsersList", func() {
 	var config rainmaker.Config
+	var path, token string
 	var list rainmaker.UsersList
 
 	BeforeEach(func() {
 		config = rainmaker.Config{
 			Host: fakeCloudController.URL(),
 		}
-		list = rainmaker.NewUsersList(config)
+		path = "/v2/users"
+		token = "token"
+		query := url.Values{}
+		query.Add("results-per-page", "2")
+		query.Add("page", "1")
+		list = rainmaker.NewUsersList(config, rainmaker.NewRequestPlan(path, query))
 	})
 
 	Describe("FetchUsersList", func() {
-		It("returns a UsersList object", func() {
-			var err error
-			list, err = rainmaker.FetchUsersList(config, "/v2/organizations/org-001/users", "token")
-			Expect(err).NotTo(HaveOccurred())
-
-			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-11T18:22:51+00:00")
+		BeforeEach(func() {
+			_, err := list.Create(rainmaker.User{GUID: "user-123"}, token)
 			if err != nil {
 				panic(err)
 			}
 
-			Expect(list.TotalResults).To(Equal(4))
-			Expect(list.TotalPages).To(Equal(3))
+			_, err = list.Create(rainmaker.User{GUID: "user-456"}, token)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		It("returns a UsersList object", func() {
+			var err error
+			list, err = rainmaker.FetchUsersList(config, rainmaker.NewRequestPlan(path, url.Values{}), token)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(list.TotalResults).To(Equal(2))
+			Expect(list.TotalPages).To(Equal(1))
 			Expect(list.PrevURL).To(Equal(""))
-			Expect(list.NextURL).To(Equal("/v2/organizations/org-001/users?page=2"))
+			Expect(list.NextURL).To(Equal(""))
 
 			users := list.Users
-			Expect(len(users)).To(Equal(2))
-			Expect(users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-123",
-				URL:                            "/v2/users/user-123",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-123/spaces",
-				OrganizationsURL:               "/v2/users/user-123/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-123/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-123/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-123/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-123/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-123/audited_spaces",
-			}))
+			Expect(users).To(HaveLen(2))
 
-			Expect(users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-456",
-				URL:                            "/v2/users/user-456",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-456/spaces",
-				OrganizationsURL:               "/v2/users/user-456/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-456/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-456/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-456/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-456/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-456/audited_spaces",
-			}))
+			var userGUIDs []string
+			for _, user := range users {
+				userGUIDs = append(userGUIDs, user.GUID)
+			}
+			Expect(userGUIDs).To(ConsistOf([]string{"user-123", "user-456"}))
+		})
+	})
+
+	Describe("Create", func() {
+		It("adds a user to the list", func() {
+			user, err := list.Create(rainmaker.User{GUID: "user-123"}, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(user.GUID).To(Equal("user-123"))
+
+			err = list.Fetch(token)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(list.Users).To(HaveLen(1))
+			Expect(list.Users[0].GUID).To(Equal("user-123"))
 		})
 	})
 
 	Describe("Next", func() {
-		It("returns the next UserList result for the paginated set", func() {
-			list.NextURL = "/v2/organizations/org-001/users?page=2"
-			nextList, err := list.Next("token")
-			Expect(err).NotTo(HaveOccurred())
-
-			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-11T18:22:51+00:00")
+		BeforeEach(func() {
+			_, err := list.Create(rainmaker.User{GUID: "user-123"}, token)
 			if err != nil {
 				panic(err)
 			}
 
-			Expect(nextList.TotalResults).To(Equal(4))
-			Expect(nextList.TotalPages).To(Equal(3))
-			Expect(len(nextList.Users)).To(Equal(1))
-			Expect(nextList.Users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-next",
-				URL:                            "/v2/users/user-next",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-next/spaces",
-				OrganizationsURL:               "/v2/users/user-next/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-next/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-next/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-next/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-next/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-next/audited_spaces",
-			}))
+			_, err = list.Create(rainmaker.User{GUID: "user-456"}, token)
+			if err != nil {
+				panic(err)
+			}
+
+			_, err = list.Create(rainmaker.User{GUID: "user-789"}, token)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		It("returns the next UserList result for the paginated set", func() {
+			err := list.Fetch(token)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(list.Users).To(HaveLen(2))
+			Expect(list.HasNextPage()).To(BeTrue())
+			Expect(list.HasPrevPage()).To(BeFalse())
+			Expect(list.TotalResults).To(Equal(3))
+			Expect(list.TotalPages).To(Equal(2))
+
+			nextList, err := list.Next(token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(nextList.Users).To(HaveLen(1))
+			Expect(nextList.HasNextPage()).To(BeFalse())
+			Expect(nextList.HasPrevPage()).To(BeTrue())
+			Expect(nextList.TotalResults).To(Equal(3))
+			Expect(nextList.TotalPages).To(Equal(2))
+
+			var users []rainmaker.User
+			users = append(users, list.Users...)
+			users = append(users, nextList.Users...)
+			Expect(users).To(HaveLen(3))
+
+			var guids []string
+			for _, user := range users {
+				guids = append(guids, user.GUID)
+			}
+			Expect(guids).To(ConsistOf([]string{"user-123", "user-456", "user-789"}))
 		})
 	})
 
 	Describe("Prev", func() {
-		It("returns the previous UserList result for the paginated set", func() {
-			list.PrevURL = "/v2/organizations/org-001/users?page=1"
-			nextList, err := list.Prev("token")
-			Expect(err).NotTo(HaveOccurred())
-
-			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-11T18:22:51+00:00")
+		BeforeEach(func() {
+			_, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)
 			if err != nil {
 				panic(err)
 			}
 
-			Expect(nextList.TotalResults).To(Equal(4))
-			Expect(nextList.TotalPages).To(Equal(3))
-			Expect(nextList.Users).To(HaveLen(2))
-			Expect(nextList.Users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-123",
-				URL:                            "/v2/users/user-123",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-123/spaces",
-				OrganizationsURL:               "/v2/users/user-123/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-123/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-123/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-123/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-123/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-123/audited_spaces",
-			}))
+			_, err = list.Create(rainmaker.User{GUID: "user-def"}, token)
+			if err != nil {
+				panic(err)
+			}
 
-			Expect(nextList.Users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-456",
-				URL:                            "/v2/users/user-456",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-456/spaces",
-				OrganizationsURL:               "/v2/users/user-456/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-456/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-456/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-456/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-456/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-456/audited_spaces",
-			}))
+			_, err = list.Create(rainmaker.User{GUID: "user-xyz"}, token)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		It("returns the previous UserList result for the paginated set", func() {
+			query := url.Values{}
+			query.Set("page", "2")
+			query.Set("results-per-page", "2")
+
+			list := rainmaker.NewUsersList(config, rainmaker.NewRequestPlan(path, query))
+			err := list.Fetch(token)
+			if err != nil {
+				panic(err)
+			}
+
+			Expect(list.Users).To(HaveLen(1))
+			Expect(list.HasNextPage()).To(BeFalse())
+			Expect(list.HasPrevPage()).To(BeTrue())
+			Expect(list.TotalResults).To(Equal(3))
+			Expect(list.TotalPages).To(Equal(2))
+
+			prevList, err := list.Prev(token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(prevList.Users).To(HaveLen(2))
+			Expect(prevList.HasNextPage()).To(BeTrue())
+			Expect(prevList.HasPrevPage()).To(BeFalse())
+			Expect(prevList.TotalResults).To(Equal(3))
+			Expect(prevList.TotalPages).To(Equal(2))
+
+			var users []rainmaker.User
+			users = append(users, list.Users...)
+			users = append(users, prevList.Users...)
+			Expect(users).To(HaveLen(3))
+
+			var guids []string
+			for _, user := range users {
+				guids = append(guids, user.GUID)
+			}
+			Expect(guids).To(ConsistOf([]string{"user-abc", "user-def", "user-xyz"}))
 		})
 	})
 
 	Describe("HasNextPage", func() {
 		It("indicates whether or not there is a next page of results", func() {
-			list.NextURL = "/v2/organizations/org-001/users?page=2"
+			list.NextURL = "/v2/users?page=2"
 			Expect(list.HasNextPage()).To(BeTrue())
 
 			list.NextURL = ""
@@ -169,7 +195,7 @@ var _ = Describe("UsersList", func() {
 
 	Describe("HasPrevPage", func() {
 		It("indicates whether or not there is a previous page of results", func() {
-			list.PrevURL = "/v2/organizations/org-001/users?page=1"
+			list.PrevURL = "/v2/users?page=1"
 			Expect(list.HasPrevPage()).To(BeTrue())
 
 			list.PrevURL = ""
@@ -178,87 +204,60 @@ var _ = Describe("UsersList", func() {
 	})
 
 	Describe("AllUsers", func() {
-		It("returns a slice of all of users", func() {
-			var err error
-			list, err = rainmaker.FetchUsersList(config, "/v2/organizations/org-001/users?page=2", "token")
-			Expect(err).NotTo(HaveOccurred())
-
-			userCreatedAt, err := time.Parse(time.RFC3339, "2014-11-11T18:22:51+00:00")
+		BeforeEach(func() {
+			_, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)
 			if err != nil {
 				panic(err)
 			}
 
-			users, err := list.AllUsers("token")
+			_, err = list.Create(rainmaker.User{GUID: "user-def"}, token)
+			if err != nil {
+				panic(err)
+			}
+
+			_, err = list.Create(rainmaker.User{GUID: "user-xyz"}, token)
+			if err != nil {
+				panic(err)
+			}
+		})
+
+		It("returns a slice of all of users", func() {
+			err := list.Fetch(token)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(users).To(HaveLen(4))
-			Expect(users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-123",
-				URL:                            "/v2/users/user-123",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-123/spaces",
-				OrganizationsURL:               "/v2/users/user-123/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-123/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-123/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-123/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-123/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-123/audited_spaces",
-			}))
+			users, err := list.AllUsers(token)
+			Expect(err).NotTo(HaveOccurred())
 
-			Expect(users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-456",
-				URL:                            "/v2/users/user-456",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-456/spaces",
-				OrganizationsURL:               "/v2/users/user-456/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-456/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-456/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-456/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-456/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-456/audited_spaces",
-			}))
+			Expect(users).To(HaveLen(3))
+			var guids []string
+			for _, user := range users {
+				guids = append(guids, user.GUID)
+			}
+			Expect(guids).To(ConsistOf([]string{"user-abc", "user-def", "user-xyz"}))
+		})
+	})
 
-			Expect(users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-next",
-				URL:                            "/v2/users/user-next",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-next/spaces",
-				OrganizationsURL:               "/v2/users/user-next/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-next/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-next/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-next/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-next/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-next/audited_spaces",
-			}))
+	Describe("Associate", func() {
+		It("associates a user with the listed resource", func() {
+			spaceGUID := "space-abc"
+			fakeCloudController.Spaces.Add(fakes.Space{
+				GUID:       spaceGUID,
+				Developers: fakes.NewUsers(),
+			})
 
-			Expect(users).To(ContainElement(rainmaker.User{
-				GUID:                           "user-last",
-				URL:                            "/v2/users/user-last",
-				CreatedAt:                      userCreatedAt,
-				UpdatedAt:                      time.Time{},
-				Admin:                          false,
-				Active:                         true,
-				DefaultSpaceGUID:               "",
-				SpacesURL:                      "/v2/users/user-last/spaces",
-				OrganizationsURL:               "/v2/users/user-last/organizations",
-				ManagedOrganizationsURL:        "/v2/users/user-last/managed_organizations",
-				BillingManagedOrganizationsURL: "/v2/users/user-last/billing_managed_organizations",
-				AuditedOrganizationsURL:        "/v2/users/user-last/audited_organizations",
-				ManagedSpacesURL:               "/v2/users/user-last/managed_spaces",
-				AuditedSpacesURL:               "/v2/users/user-last/audited_spaces",
-			}))
+			user, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)
+			if err != nil {
+				panic(err)
+			}
+
+			list = rainmaker.NewUsersList(config, rainmaker.NewRequestPlan("/v2/spaces/"+spaceGUID+"/developers", url.Values{}))
+			err = list.Associate(user.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = list.Fetch(token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(list.Users).To(HaveLen(1))
+			Expect(list.Users[0].GUID).To(Equal(user.GUID))
 		})
 	})
 })

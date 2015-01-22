@@ -8,9 +8,17 @@ import (
 type Space struct {
 	GUID             string
 	Name             string
+	Users            *Users
 	OrganizationGUID string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+	Developers       *Users
+}
+
+func NewSpace() Space {
+	return Space{
+		Developers: NewUsers(),
+	}
 }
 
 func (space Space) MarshalJSON() ([]byte, error) {

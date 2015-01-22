@@ -30,6 +30,22 @@ func (err NotFoundError) Error() string {
 	return fmt.Sprintf("Rainmaker NotFoundError: %s", err.message)
 }
 
+type UnexpectedStatusError struct {
+	status  int
+	message []byte
+}
+
+func NewUnexpectedStatusError(status int, message []byte) UnexpectedStatusError {
+	return UnexpectedStatusError{
+		status:  status,
+		message: message,
+	}
+}
+
+func (err UnexpectedStatusError) Error() string {
+	return fmt.Sprintf("Rainmaker UnexpectedStatusError: %d %s", err.status, err.message)
+}
+
 type ResponseReadError struct {
 	internalError error
 }

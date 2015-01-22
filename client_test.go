@@ -32,7 +32,7 @@ var _ = Describe("Client", func() {
 	Describe("makeRequest", func() {
 		Context("when an error occurs", func() {
 			It("returns a RequestBodyMarshalError when the request body cannot be marshalled", func() {
-				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", unsupportedJSONType)
+				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", unsupportedJSONType, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(BeAssignableToTypeOf(rainmaker.RequestBodyMarshalError{}))
@@ -40,7 +40,7 @@ var _ = Describe("Client", func() {
 
 			It("returns a RequestConfigurationError when the request params are bad", func() {
 				client.Config.Host = "://example.com"
-				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil)
+				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(BeAssignableToTypeOf(rainmaker.RequestConfigurationError{}))
@@ -48,7 +48,7 @@ var _ = Describe("Client", func() {
 
 			It("returns a RequestHTTPError when the request fails", func() {
 				client.Config.Host = "banana://example.com"
-				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil)
+				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(BeAssignableToTypeOf(rainmaker.RequestHTTPError{}))
@@ -61,10 +61,25 @@ var _ = Describe("Client", func() {
 				}))
 				client.Config.Host = fakeServer.URL
 
-				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil)
+				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)
 				Expect(err).To(HaveOccurred())
 				Expect(err).To(BeAssignableToTypeOf(rainmaker.ResponseReadError{}))
+
+				fakeServer.Close()
+			})
+
+			It("returns an UnexpectedStatusError when the response status is not an expected value", func() {
+				fakeServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+					w.WriteHeader(http.StatusTeapot)
+					w.Write([]byte(`I'm a little teapot`))
+				}))
+				client.Config.Host = fakeServer.URL
+
+				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
+				_, _, err := client.MakeRequest(requestArgs)
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(MatchError(rainmaker.NewUnexpectedStatusError(http.StatusTeapot, []byte(`I'm a little teapot`))))
 
 				fakeServer.Close()
 			})

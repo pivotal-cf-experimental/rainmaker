@@ -24,3 +24,7 @@ var _ = BeforeSuite(func() {
 var _ = AfterSuite(func() {
 	fakeCloudController.Close()
 })
+
+var _ = BeforeEach(func() {
+	fakeCloudController.Reset()
+})

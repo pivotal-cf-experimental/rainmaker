@@ -2,6 +2,8 @@ package rainmaker
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/pivotal-golang/rainmaker/internal/documents"
@@ -27,11 +29,20 @@ type Organization struct {
 	SpaceQuotaDefinitionsURL string
 	CreatedAt                time.Time
 	UpdatedAt                time.Time
+	Users                    UsersList
+	BillingManagers          UsersList
+	Auditors                 UsersList
+	Managers                 UsersList
 }
 
-func NewOrganization(config Config) Organization {
+func NewOrganization(config Config, guid string) Organization {
 	return Organization{
-		config: config,
+		config:          config,
+		GUID:            guid,
+		Users:           NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/users", url.Values{})),
+		BillingManagers: NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/billing_managers", url.Values{})),
+		Auditors:        NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/auditors", url.Values{})),
+		Managers:        NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/managers", url.Values{})),
 	}
 }
 
@@ -44,8 +55,7 @@ func NewOrganizationFromResponse(config Config, response documents.OrganizationR
 		response.Metadata.UpdatedAt = &time.Time{}
 	}
 
-	organization := NewOrganization(config)
-	organization.GUID = response.Metadata.GUID
+	organization := NewOrganization(config, response.Metadata.GUID)
 	organization.URL = response.Metadata.URL
 	organization.CreatedAt = *response.Metadata.CreatedAt
 	organization.UpdatedAt = *response.Metadata.UpdatedAt
@@ -72,6 +82,7 @@ func FetchOrganization(config Config, path, token string) (Organization, error) 
 		Method: "GET",
 		Path:   path,
 		Token:  token,
+		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
 		return Organization{}, err

@@ -1,11 +1,12 @@
 package rainmaker
 
-func NewRequestArguments(method, path, token string, body interface{}) requestArguments {
+func NewRequestArguments(method, path, token string, body interface{}, statusCodes []int) requestArguments {
 	return requestArguments{
 		Method: method,
 		Path:   path,
 		Token:  token,
 		Body:   body,
+		AcceptableStatusCodes: statusCodes,
 	}
 }
 

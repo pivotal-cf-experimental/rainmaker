@@ -4,8 +4,8 @@ type Spaces struct {
 	store map[string]Space
 }
 
-func NewSpaces() Spaces {
-	return Spaces{
+func NewSpaces() *Spaces {
+	return &Spaces{
 		store: make(map[string]Space),
 	}
 }
@@ -17,4 +17,8 @@ func (spaces Spaces) Get(guid string) (Space, bool) {
 
 func (spaces Spaces) Add(space Space) {
 	spaces.store[space.GUID] = space
+}
+
+func (spaces *Spaces) Clear() {
+	spaces.store = make(map[string]Space)
 }

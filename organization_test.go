@@ -37,8 +37,7 @@ var _ = Describe("Organization", func() {
 			organization, err := rainmaker.FetchOrganization(config, "/v2/organizations/org-001", "token-123")
 			Expect(err).NotTo(HaveOccurred())
 
-			expectedOrganization := rainmaker.NewOrganization(config)
-			expectedOrganization.GUID = "org-001"
+			expectedOrganization := rainmaker.NewOrganization(config, "org-001")
 			expectedOrganization.Name = "rainmaker-organization"
 			expectedOrganization.URL = "/v2/organizations/org-001"
 			expectedOrganization.BillingEnabled = true

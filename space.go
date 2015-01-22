@@ -2,6 +2,8 @@ package rainmaker
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/pivotal-golang/rainmaker/internal/documents"
@@ -27,16 +29,19 @@ type Space struct {
 	AppEventsURL             string
 	EventsURL                string
 	SecurityGroupsURL        string
+	Developers               UsersList
 }
 
-func NewSpace(config Config) Space {
+func NewSpace(config Config, guid string) Space {
 	return Space{
-		config: config,
+		config:     config,
+		GUID:       guid,
+		Developers: NewUsersList(config, NewRequestPlan("/v2/spaces/"+guid+"/developers", url.Values{})),
 	}
 }
 
 func NewSpaceFromResponse(config Config, response documents.SpaceResponse) Space {
-	space := NewSpace(config)
+	space := NewSpace(config, response.Metadata.GUID)
 	if response.Metadata.CreatedAt == nil {
 		response.Metadata.CreatedAt = &time.Time{}
 	}
@@ -45,7 +50,6 @@ func NewSpaceFromResponse(config Config, response documents.SpaceResponse) Space
 		response.Metadata.UpdatedAt = &time.Time{}
 	}
 
-	space.GUID = response.Metadata.GUID
 	space.URL = response.Metadata.URL
 	space.CreatedAt = *response.Metadata.CreatedAt
 	space.UpdatedAt = *response.Metadata.UpdatedAt
@@ -72,6 +76,7 @@ func FetchSpace(config Config, path, token string) (Space, error) {
 		Method: "GET",
 		Path:   path,
 		Token:  token,
+		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
 		return Space{}, err
