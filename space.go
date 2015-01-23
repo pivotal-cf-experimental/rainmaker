@@ -85,7 +85,7 @@ func FetchSpace(config Config, path, token string) (Space, error) {
 	var response documents.SpaceResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return Space{}, err
+		panic(err)
 	}
 
 	return NewSpaceFromResponse(config, response), nil

@@ -31,7 +31,15 @@ var _ = Describe("UsersService", func() {
 			Expect(fetchedUser.GUID).To(Equal(userGUID))
 		})
 
-		XIt("error cases", func() {
+		Context("when the request errors", func() {
+			BeforeEach(func() {
+				service = rainmaker.NewUsersService(rainmaker.Config{})
+			})
+
+			It("returns the error", func() {
+				_, err := service.Create("user-guid", token)
+				Expect(err).To(HaveOccurred())
+			})
 		})
 	})
 })

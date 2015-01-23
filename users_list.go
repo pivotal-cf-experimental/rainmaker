@@ -124,7 +124,7 @@ func (list UsersList) Create(user User, token string) (User, error) {
 
 	err = json.Unmarshal(body, &document)
 	if err != nil {
-		return User{}, err
+		panic(err)
 	}
 
 	return NewUserFromResponse(document), nil
@@ -156,7 +156,7 @@ func (list *UsersList) Fetch(token string) error {
 	var response documents.UsersListResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	updatedList := NewUsersListFromResponse(list.config, list.plan, response)

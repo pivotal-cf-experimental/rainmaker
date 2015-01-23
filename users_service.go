@@ -29,7 +29,7 @@ func (service *UsersService) Create(guid, token string) (User, error) {
 		AcceptableStatusCodes: []int{http.StatusCreated},
 	})
 	if err != nil {
-		panic(err)
+		return User{}, err
 	}
 
 	var document documents.UserResponse

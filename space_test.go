@@ -70,5 +70,13 @@ var _ = Describe("Space", func() {
 
 			Expect(space).To(Equal(expectedSpace))
 		})
+
+		Context("when errors happen", func() {
+			It("returns the error", func() {
+				config.Host = ""
+				_, err := rainmaker.FetchSpace(config, "/v2/spaces/space-001", "token-asd")
+				Expect(err).To(HaveOccurred())
+			})
+		})
 	})
 })

@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 DIR=`cd $(dirname $0)/.. && pwd`
 
@@ -9,4 +9,4 @@ CC_HOST=https://api.10.244.0.34.xip.io
 
 cf orgs | grep "^org-" | sort -r | xargs -n 1 cf delete-org -f
 
-TRACE=true ginkgo -r $DIR/acceptance
+ginkgo -r $DIR/acceptance

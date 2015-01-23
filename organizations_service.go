@@ -35,7 +35,7 @@ func (service OrganizationsService) Create(name string, token string) (Organizat
 	var response documents.OrganizationResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return Organization{}, err
+		panic(err)
 	}
 
 	return NewOrganizationFromResponse(service.config, response), nil

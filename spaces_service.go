@@ -31,7 +31,7 @@ func (service SpacesService) Create(name, orgGUID, token string) (Space, error) 
 		AcceptableStatusCodes: []int{http.StatusCreated},
 	})
 	if err != nil {
-		panic(err)
+		return Space{}, err
 	}
 
 	var response documents.SpaceResponse

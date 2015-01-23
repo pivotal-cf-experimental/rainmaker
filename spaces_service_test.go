@@ -40,7 +40,16 @@ var _ = Describe("SpacesService", func() {
 			Expect(fetchedSpace.GUID).To(Equal(space.GUID))
 		})
 
-		XIt("error cases", func() {
+		Context("When the request errors", func() {
+			BeforeEach(func() {
+				config.Host = ""
+				service = rainmaker.NewSpacesService(config)
+			})
+
+			It("returns the error", func() {
+				_, err := service.Create("space-name", "org-guid", token)
+				Expect(err).To(HaveOccurred())
+			})
 		})
 	})
 

@@ -66,7 +66,7 @@ func FetchUser(config Config, path, token string) (User, error) {
 	var response documents.UserResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return User{}, err
+		panic(err)
 	}
 
 	return NewUserFromResponse(response), nil

@@ -91,7 +91,7 @@ func FetchOrganization(config Config, path, token string) (Organization, error) 
 	var response documents.OrganizationResponse
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return Organization{}, err
+		panic(err)
 	}
 
 	return NewOrganizationFromResponse(config, response), nil
