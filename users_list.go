@@ -145,11 +145,8 @@ func (list *UsersList) Fetch(token string) error {
 	_, body, err := NewClient(list.config).makeRequest(requestArguments{
 		Method: "GET",
 		Path:   list.plan.Path,
-		Query: url.Values{
-			"page":             list.plan.Query["page"],
-			"results-per-page": list.plan.Query["results-per-page"],
-		},
-		Token: token,
+		Query:  list.plan.Query,
+		Token:  token,
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {

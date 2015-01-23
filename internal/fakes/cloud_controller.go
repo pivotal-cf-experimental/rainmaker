@@ -33,11 +33,13 @@ func NewCloudController() *CloudController {
 	router.HandleFunc("/v2/organizations/{guid}/auditors/{auditor_guid}", fake.AssociateAuditorToOrganization).Methods("PUT")
 	router.HandleFunc("/v2/organizations/{guid}/managers", fake.GetOrganizationManagers).Methods("GET")
 	router.HandleFunc("/v2/organizations/{guid}/managers/{manager_guid}", fake.AssociateManagerToOrganization).Methods("PUT")
+	router.HandleFunc("/v2/spaces", fake.CreateSpace).Methods("POST")
 	router.HandleFunc("/v2/spaces/{guid}", fake.GetSpace).Methods("GET")
 	router.HandleFunc("/v2/spaces/{guid}/developers/{developer_guid}", fake.AssociateDeveloperToSpace).Methods("PUT")
 	router.HandleFunc("/v2/spaces/{guid}/developers", fake.GetSpaceDevelopers).Methods("GET")
 	router.HandleFunc("/v2/users", fake.GetUsers).Methods("GET")
 	router.HandleFunc("/v2/users", fake.CreateUser).Methods("POST")
+	router.HandleFunc("/v2/users/{guid}", fake.GetUser).Methods("GET")
 
 	handler := fake.RequireToken(router)
 	fake.server = httptest.NewUnstartedServer(handler)

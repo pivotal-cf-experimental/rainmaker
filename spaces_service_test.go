@@ -1,10 +1,7 @@
 package rainmaker_test
 
 import (
-	"net/url"
-
 	"github.com/pivotal-golang/rainmaker"
-	"github.com/pivotal-golang/rainmaker/internal/fakes"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -13,39 +10,58 @@ import (
 var _ = Describe("SpacesService", func() {
 	var config rainmaker.Config
 	var service *rainmaker.SpacesService
-	var token, spaceGUID string
+	var token, spaceName string
+	var org rainmaker.Organization
 
 	BeforeEach(func() {
+		var err error
 		token = "token-asd"
 		config = rainmaker.Config{
 			Host: fakeCloudController.URL(),
 		}
 		service = rainmaker.NewSpacesService(config)
-		spaceGUID = "space-001"
+		spaceName = "my-space"
 
-		fakeCloudController.Spaces.Add(fakes.Space{
-			GUID:       spaceGUID,
-			Developers: fakes.NewUsers(),
-		})
+		org, err = rainmaker.NewOrganizationsService(config).Create("org-123", token)
+		if err != nil {
+			panic(err)
+		}
 	})
 
-	Describe("Get", func() {
-		It("returns the space matching the given GUID", func() {
-			space, err := service.Get(spaceGUID, token)
+	Describe("Create/Get", func() {
+		It("create a space and allows it to be fetched from the cloud controller", func() {
+			space, err := service.Create(spaceName, org.GUID, token)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(space.GUID).To(Equal(spaceGUID))
+			Expect(space.Name).To(Equal(spaceName))
+			Expect(space.OrganizationGUID).To(Equal(org.GUID))
+
+			fetchedSpace, err := service.Get(space.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fetchedSpace.GUID).To(Equal(space.GUID))
+		})
+
+		XIt("error cases", func() {
 		})
 	})
 
 	Describe("ListUsers", func() {
+		var user rainmaker.User
+		var space rainmaker.Space
+
 		BeforeEach(func() {
-			list := rainmaker.NewUsersList(config, rainmaker.NewRequestPlan("/v2/users", url.Values{}))
-			user, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)
+			var err error
+
+			user, err = rainmaker.NewUsersService(config).Create("user-abc", token)
 			if err != nil {
 				panic(err)
 			}
 
-			space, err := service.Get(spaceGUID, token)
+			_, err = rainmaker.NewUsersService(config).Create("user-xyz", token)
+			if err != nil {
+				panic(err)
+			}
+
+			space, err = service.Create(spaceName, org.GUID, token)
 			if err != nil {
 				panic(err)
 			}
@@ -58,13 +74,13 @@ var _ = Describe("SpacesService", func() {
 		})
 
 		It("returns the users belonging to the space", func() {
-			list, err := service.ListUsers(spaceGUID, token)
+			list, err := service.ListUsers(space.GUID, token)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(list.TotalResults).To(Equal(1))
 			Expect(list.TotalPages).To(Equal(1))
 			Expect(list.Users).To(HaveLen(1))
 
-			Expect(list.Users[0].GUID).To(Equal("user-abc"))
+			Expect(list.Users[0].GUID).To(Equal(user.GUID))
 		})
 	})
 })

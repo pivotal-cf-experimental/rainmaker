@@ -15,8 +15,10 @@ type Space struct {
 	Developers       *Users
 }
 
-func NewSpace() Space {
+func NewSpace(guid string) Space {
 	return Space{
+		GUID:       guid,
+		Users:      NewUsers(),
 		Developers: NewUsers(),
 	}
 }

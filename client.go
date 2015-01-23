@@ -3,9 +3,11 @@ package rainmaker
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/pivotal-golang/rainmaker/internal/network"
 )
@@ -14,17 +16,25 @@ type Client struct {
 	Config        Config
 	Organizations *OrganizationsService
 	Spaces        *SpacesService
+	Users         *UsersService
 }
 
 func NewClient(config Config) Client {
-	client := Client{
-		Config: config,
+	return Client{
+		Config:        config,
+		Organizations: NewOrganizationsService(config),
+		Spaces:        NewSpacesService(config),
+		Users:         NewUsersService(config),
 	}
+}
 
-	client.Organizations = NewOrganizationsService(config)
-	client.Spaces = NewSpacesService(config)
-
-	return client
+type requestArguments struct {
+	Method                string
+	Path                  string
+	Query                 url.Values
+	Token                 string
+	Body                  interface{}
+	AcceptableStatusCodes []int
 }
 
 func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, error) {
@@ -41,6 +51,7 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 	if err != nil {
 		return 0, []byte{}, NewRequestConfigurationError(err)
 	}
+
 	requestURL.Path = requestArgs.Path
 	requestURL.RawQuery = requestArgs.Query.Encode()
 
@@ -50,6 +61,8 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 	}
 
 	request.Header.Set("Authorization", "Bearer "+requestArgs.Token)
+
+	client.printRequest(request)
 
 	networkClient := network.GetClient(network.Config{SkipVerifySSL: client.Config.SkipVerifySSL})
 	response, err := networkClient.Do(request)
@@ -61,6 +74,8 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 	if err != nil {
 		return 0, []byte{}, NewResponseReadError(err)
 	}
+
+	client.printResponse(response.StatusCode, responseBody)
 
 	if response.StatusCode == 404 {
 		return 0, []byte{}, NewNotFoundError(responseBody)
@@ -79,19 +94,22 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 	return response.StatusCode, responseBody, NewUnexpectedStatusError(response.StatusCode, responseBody)
 }
 
+func (client Client) printRequest(request *http.Request) {
+	if os.Getenv("TRACE") != "" {
+		fmt.Printf("\nREQUEST: %+v\n", request)
+	}
+}
+
+func (client Client) printResponse(status int, body []byte) {
+	if os.Getenv("TRACE") != "" {
+		fmt.Printf("\nRESPONSE: %d %s\n", status, body)
+	}
+}
+
 func (client Client) unmarshal(body []byte, response interface{}) error {
 	err := json.Unmarshal(body, response)
 	if err != nil {
 		return NewResponseBodyUnmarshalError(err)
 	}
 	return nil
-}
-
-type requestArguments struct {
-	Method                string
-	Path                  string
-	Query                 url.Values
-	Token                 string
-	Body                  interface{}
-	AcceptableStatusCodes []int
 }

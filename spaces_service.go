@@ -1,8 +1,12 @@
 package rainmaker
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
+
+	"github.com/pivotal-golang/rainmaker/internal/documents"
 )
 
 type SpacesService struct {
@@ -13,6 +17,30 @@ func NewSpacesService(config Config) *SpacesService {
 	return &SpacesService{
 		config: config,
 	}
+}
+
+func (service SpacesService) Create(name, orgGUID, token string) (Space, error) {
+	_, body, err := NewClient(service.config).makeRequest(requestArguments{
+		Method: "POST",
+		Path:   "/v2/spaces",
+		Body: documents.CreateSpaceRequest{
+			Name:             name,
+			OrganizationGUID: orgGUID,
+		},
+		Token: token,
+		AcceptableStatusCodes: []int{http.StatusCreated},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	var response documents.SpaceResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		panic(err)
+	}
+
+	return NewSpaceFromResponse(service.config, response), nil
 }
 
 func (service SpacesService) Get(guid, token string) (Space, error) {

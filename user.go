@@ -1,6 +1,8 @@
 package rainmaker
 
 import (
+	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/pivotal-golang/rainmaker/internal/documents"
@@ -48,4 +50,24 @@ func NewUserFromResponse(response documents.UserResponse) User {
 		ManagedSpacesURL:               response.Entity.ManagedSpacesURL,
 		AuditedSpacesURL:               response.Entity.AuditedSpacesURL,
 	}
+}
+
+func FetchUser(config Config, path, token string) (User, error) {
+	_, body, err := NewClient(config).makeRequest(requestArguments{
+		Method: "GET",
+		Path:   path,
+		Token:  token,
+		AcceptableStatusCodes: []int{http.StatusOK},
+	})
+	if err != nil {
+		return User{}, err
+	}
+
+	var response documents.UserResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return User{}, err
+	}
+
+	return NewUserFromResponse(response), nil
 }
