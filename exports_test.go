@@ -1,5 +1,7 @@
 package rainmaker
 
+import "net/url"
+
 func NewRequestArguments(method, path, token string, body interface{}, statusCodes []int) requestArguments {
 	return requestArguments{
 		Method: method,
@@ -16,4 +18,8 @@ func (client Client) MakeRequest(requestArgs requestArguments) (int, []byte, err
 
 func (client Client) Unmarshal(body []byte, response interface{}) error {
 	return client.unmarshal(body, response)
+}
+
+func NewRequestPlan(path string, query url.Values) requestPlan {
+	return newRequestPlan(path, query)
 }

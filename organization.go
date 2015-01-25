@@ -39,10 +39,10 @@ func NewOrganization(config Config, guid string) Organization {
 	return Organization{
 		config:          config,
 		GUID:            guid,
-		Users:           NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/users", url.Values{})),
-		BillingManagers: NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/billing_managers", url.Values{})),
-		Auditors:        NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/auditors", url.Values{})),
-		Managers:        NewUsersList(config, NewRequestPlan("/v2/organizations/"+guid+"/managers", url.Values{})),
+		Users:           NewUsersList(config, newRequestPlan("/v2/organizations/"+guid+"/users", url.Values{})),
+		BillingManagers: NewUsersList(config, newRequestPlan("/v2/organizations/"+guid+"/billing_managers", url.Values{})),
+		Auditors:        NewUsersList(config, newRequestPlan("/v2/organizations/"+guid+"/auditors", url.Values{})),
+		Managers:        NewUsersList(config, newRequestPlan("/v2/organizations/"+guid+"/managers", url.Values{})),
 	}
 }
 

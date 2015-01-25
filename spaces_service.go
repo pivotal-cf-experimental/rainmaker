@@ -51,5 +51,5 @@ func (service SpacesService) ListUsers(guid, token string) (UsersList, error) {
 	query := url.Values{}
 	query.Set("q", fmt.Sprintf("space_guid:%s", guid))
 
-	return FetchUsersList(service.config, NewRequestPlan("/v2/users", query), token)
+	return FetchUsersList(service.config, newRequestPlan("/v2/users", query), token)
 }

@@ -67,7 +67,7 @@ func (list UsersList) Next(token string) (UsersList, error) {
 		return UsersList{}, err
 	}
 
-	return FetchUsersList(list.config, NewRequestPlan(nextURL.Path, nextURL.Query()), token)
+	return FetchUsersList(list.config, newRequestPlan(nextURL.Path, nextURL.Query()), token)
 }
 
 func (list UsersList) Prev(token string) (UsersList, error) {
@@ -76,7 +76,7 @@ func (list UsersList) Prev(token string) (UsersList, error) {
 		return UsersList{}, err
 	}
 
-	return FetchUsersList(list.config, NewRequestPlan(prevURL.Path, prevURL.Query()), token)
+	return FetchUsersList(list.config, newRequestPlan(prevURL.Path, prevURL.Query()), token)
 }
 
 func (list UsersList) AllUsers(token string) ([]User, error) {

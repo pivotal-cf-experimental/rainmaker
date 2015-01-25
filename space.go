@@ -36,7 +36,7 @@ func NewSpace(config Config, guid string) Space {
 	return Space{
 		config:     config,
 		GUID:       guid,
-		Developers: NewUsersList(config, NewRequestPlan("/v2/spaces/"+guid+"/developers", url.Values{})),
+		Developers: NewUsersList(config, newRequestPlan("/v2/spaces/"+guid+"/developers", url.Values{})),
 	}
 }
 
