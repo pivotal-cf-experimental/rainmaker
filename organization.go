@@ -1,8 +1,6 @@
 package rainmaker
 
 import (
-	"encoding/json"
-	"net/http"
 	"net/url"
 	"time"
 
@@ -44,26 +42,6 @@ func NewOrganization(config Config, guid string) Organization {
 		Auditors:        NewUsersList(config, newRequestPlan("/v2/organizations/"+guid+"/auditors", url.Values{})),
 		Managers:        NewUsersList(config, newRequestPlan("/v2/organizations/"+guid+"/managers", url.Values{})),
 	}
-}
-
-func FetchOrganization(config Config, path, token string) (Organization, error) {
-	_, body, err := NewClient(config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   path,
-		Token:  token,
-		AcceptableStatusCodes: []int{http.StatusOK},
-	})
-	if err != nil {
-		return Organization{}, err
-	}
-
-	var response documents.OrganizationResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		panic(err)
-	}
-
-	return newOrganizationFromResponse(config, response), nil
 }
 
 func newOrganizationFromResponse(config Config, response documents.OrganizationResponse) Organization {

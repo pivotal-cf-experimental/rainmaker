@@ -1,6 +1,10 @@
 package rainmaker
 
-import "net/url"
+import (
+	"net/url"
+
+	"github.com/pivotal-golang/rainmaker/internal/documents"
+)
 
 func NewRequestArguments(method, path, token string, body interface{}, statusCodes []int) requestArguments {
 	return requestArguments{
@@ -22,4 +26,8 @@ func (client Client) Unmarshal(body []byte, response interface{}) error {
 
 func NewRequestPlan(path string, query url.Values) requestPlan {
 	return newRequestPlan(path, query)
+}
+
+func NewOrganizationFromResponse(config Config, document documents.OrganizationResponse) Organization {
+	return newOrganizationFromResponse(config, document)
 }

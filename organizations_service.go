@@ -42,7 +42,23 @@ func (service OrganizationsService) Create(name string, token string) (Organizat
 }
 
 func (service OrganizationsService) Get(guid, token string) (Organization, error) {
-	return FetchOrganization(service.config, "/v2/organizations/"+guid, token)
+	_, body, err := NewClient(service.config).makeRequest(requestArguments{
+		Method: "GET",
+		Path:   "/v2/organizations/" + guid,
+		Token:  token,
+		AcceptableStatusCodes: []int{http.StatusOK},
+	})
+	if err != nil {
+		return Organization{}, err
+	}
+
+	var response documents.OrganizationResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		panic(err)
+	}
+
+	return newOrganizationFromResponse(service.config, response), nil
 }
 
 func (service OrganizationsService) ListUsers(guid, token string) (UsersList, error) {
