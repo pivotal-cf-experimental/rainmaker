@@ -40,7 +40,7 @@ func (service SpacesService) Create(name, orgGUID, token string) (Space, error) 
 		panic(err)
 	}
 
-	return NewSpaceFromResponse(service.config, response), nil
+	return newSpaceFromResponse(service.config, response), nil
 }
 
 func (service SpacesService) Get(guid, token string) (Space, error) {

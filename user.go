@@ -25,7 +25,27 @@ type User struct {
 	AuditedSpacesURL               string
 }
 
-func NewUserFromResponse(response documents.UserResponse) User {
+func FetchUser(config Config, path, token string) (User, error) {
+	_, body, err := NewClient(config).makeRequest(requestArguments{
+		Method: "GET",
+		Path:   path,
+		Token:  token,
+		AcceptableStatusCodes: []int{http.StatusOK},
+	})
+	if err != nil {
+		return User{}, err
+	}
+
+	var response documents.UserResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		panic(err)
+	}
+
+	return newUserFromResponse(response), nil
+}
+
+func newUserFromResponse(response documents.UserResponse) User {
 	if response.Metadata.CreatedAt == nil {
 		response.Metadata.CreatedAt = &time.Time{}
 	}
@@ -50,24 +70,4 @@ func NewUserFromResponse(response documents.UserResponse) User {
 		ManagedSpacesURL:               response.Entity.ManagedSpacesURL,
 		AuditedSpacesURL:               response.Entity.AuditedSpacesURL,
 	}
-}
-
-func FetchUser(config Config, path, token string) (User, error) {
-	_, body, err := NewClient(config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   path,
-		Token:  token,
-		AcceptableStatusCodes: []int{http.StatusOK},
-	})
-	if err != nil {
-		return User{}, err
-	}
-
-	var response documents.UserResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		panic(err)
-	}
-
-	return NewUserFromResponse(response), nil
 }

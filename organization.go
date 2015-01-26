@@ -46,7 +46,27 @@ func NewOrganization(config Config, guid string) Organization {
 	}
 }
 
-func NewOrganizationFromResponse(config Config, response documents.OrganizationResponse) Organization {
+func FetchOrganization(config Config, path, token string) (Organization, error) {
+	_, body, err := NewClient(config).makeRequest(requestArguments{
+		Method: "GET",
+		Path:   path,
+		Token:  token,
+		AcceptableStatusCodes: []int{http.StatusOK},
+	})
+	if err != nil {
+		return Organization{}, err
+	}
+
+	var response documents.OrganizationResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		panic(err)
+	}
+
+	return newOrganizationFromResponse(config, response), nil
+}
+
+func newOrganizationFromResponse(config Config, response documents.OrganizationResponse) Organization {
 	if response.Metadata.CreatedAt == nil {
 		response.Metadata.CreatedAt = &time.Time{}
 	}
@@ -75,24 +95,4 @@ func NewOrganizationFromResponse(config Config, response documents.OrganizationR
 	organization.SpaceQuotaDefinitionsURL = response.Entity.SpaceQuotaDefinitionsURL
 
 	return organization
-}
-
-func FetchOrganization(config Config, path, token string) (Organization, error) {
-	_, body, err := NewClient(config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   path,
-		Token:  token,
-		AcceptableStatusCodes: []int{http.StatusOK},
-	})
-	if err != nil {
-		return Organization{}, err
-	}
-
-	var response documents.OrganizationResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		panic(err)
-	}
-
-	return NewOrganizationFromResponse(config, response), nil
 }

@@ -38,7 +38,7 @@ func (service OrganizationsService) Create(name string, token string) (Organizat
 		panic(err)
 	}
 
-	return NewOrganizationFromResponse(service.config, response), nil
+	return newOrganizationFromResponse(service.config, response), nil
 }
 
 func (service OrganizationsService) Get(guid, token string) (Organization, error) {

@@ -35,7 +35,7 @@ func NewUsersListFromResponse(config Config, plan requestPlan, response document
 	list.Users = make([]User, 0)
 
 	for _, userResponse := range response.Resources {
-		list.Users = append(list.Users, NewUserFromResponse(userResponse))
+		list.Users = append(list.Users, newUserFromResponse(userResponse))
 	}
 
 	return list
@@ -127,7 +127,7 @@ func (list UsersList) Create(user User, token string) (User, error) {
 		panic(err)
 	}
 
-	return NewUserFromResponse(document), nil
+	return newUserFromResponse(document), nil
 }
 
 func (list UsersList) Associate(userGUID, token string) error {

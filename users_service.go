@@ -38,7 +38,7 @@ func (service *UsersService) Create(guid, token string) (User, error) {
 		panic(err)
 	}
 
-	return NewUserFromResponse(document), nil
+	return newUserFromResponse(document), nil
 }
 
 func (service UsersService) Get(guid, token string) (User, error) {
