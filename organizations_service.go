@@ -62,17 +62,29 @@ func (service OrganizationsService) Get(guid, token string) (Organization, error
 }
 
 func (service OrganizationsService) ListUsers(guid, token string) (UsersList, error) {
-	return FetchUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/users", url.Values{}), token)
+	list := NewUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/users", url.Values{}))
+	err := list.Fetch(token)
+
+	return list, err
 }
 
 func (service OrganizationsService) ListBillingManagers(guid, token string) (UsersList, error) {
-	return FetchUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/billing_managers", url.Values{}), token)
+	list := NewUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/billing_managers", url.Values{}))
+	err := list.Fetch(token)
+
+	return list, err
 }
 
 func (service OrganizationsService) ListAuditors(guid, token string) (UsersList, error) {
-	return FetchUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/auditors", url.Values{}), token)
+	list := NewUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/auditors", url.Values{}))
+	err := list.Fetch(token)
+
+	return list, err
 }
 
 func (service OrganizationsService) ListManagers(guid, token string) (UsersList, error) {
-	return FetchUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/managers", url.Values{}), token)
+	list := NewUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/managers", url.Values{}))
+	err := list.Fetch(token)
+
+	return list, err
 }

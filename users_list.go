@@ -41,18 +41,6 @@ func NewUsersListFromResponse(config Config, plan requestPlan, response document
 	return list
 }
 
-func FetchUsersList(config Config, plan requestPlan, token string) (UsersList, error) {
-	list := NewUsersList(config, plan)
-
-	err := list.Fetch(token)
-	if err != nil {
-		return list, err
-	}
-
-	return list, nil
-
-}
-
 func (list UsersList) HasNextPage() bool {
 	return list.NextURL != ""
 }
@@ -67,7 +55,10 @@ func (list UsersList) Next(token string) (UsersList, error) {
 		return UsersList{}, err
 	}
 
-	return FetchUsersList(list.config, newRequestPlan(nextURL.Path, nextURL.Query()), token)
+	nextList := NewUsersList(list.config, newRequestPlan(nextURL.Path, nextURL.Query()))
+	err = nextList.Fetch(token)
+
+	return nextList, err
 }
 
 func (list UsersList) Prev(token string) (UsersList, error) {
@@ -76,7 +67,10 @@ func (list UsersList) Prev(token string) (UsersList, error) {
 		return UsersList{}, err
 	}
 
-	return FetchUsersList(list.config, newRequestPlan(prevURL.Path, prevURL.Query()), token)
+	prevList := NewUsersList(list.config, newRequestPlan(prevURL.Path, prevURL.Query()))
+	err = prevList.Fetch(token)
+
+	return prevList, err
 }
 
 func (list UsersList) AllUsers(token string) ([]User, error) {
