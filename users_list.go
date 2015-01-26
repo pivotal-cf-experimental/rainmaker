@@ -26,7 +26,7 @@ func NewUsersList(config Config, plan requestPlan) UsersList {
 	}
 }
 
-func NewUsersListFromResponse(config Config, plan requestPlan, response documents.UsersListResponse) UsersList {
+func newUsersListFromResponse(config Config, plan requestPlan, response documents.UsersListResponse) UsersList {
 	list := NewUsersList(config, plan)
 	list.TotalResults = response.TotalResults
 	list.TotalPages = response.TotalPages
@@ -153,7 +153,7 @@ func (list *UsersList) Fetch(token string) error {
 		panic(err)
 	}
 
-	updatedList := NewUsersListFromResponse(list.config, list.plan, response)
+	updatedList := newUsersListFromResponse(list.config, list.plan, response)
 	list.TotalResults = updatedList.TotalResults
 	list.TotalPages = updatedList.TotalPages
 	list.NextURL = updatedList.NextURL
