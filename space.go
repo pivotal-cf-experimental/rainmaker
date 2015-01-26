@@ -1,8 +1,6 @@
 package rainmaker
 
 import (
-	"encoding/json"
-	"net/http"
 	"net/url"
 	"time"
 
@@ -38,26 +36,6 @@ func NewSpace(config Config, guid string) Space {
 		GUID:       guid,
 		Developers: NewUsersList(config, newRequestPlan("/v2/spaces/"+guid+"/developers", url.Values{})),
 	}
-}
-
-func FetchSpace(config Config, path, token string) (Space, error) {
-	_, body, err := NewClient(config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   path,
-		Token:  token,
-		AcceptableStatusCodes: []int{http.StatusOK},
-	})
-	if err != nil {
-		return Space{}, err
-	}
-
-	var response documents.SpaceResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		panic(err)
-	}
-
-	return newSpaceFromResponse(config, response), nil
 }
 
 func newSpaceFromResponse(config Config, response documents.SpaceResponse) Space {

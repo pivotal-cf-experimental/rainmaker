@@ -31,3 +31,7 @@ func NewRequestPlan(path string, query url.Values) requestPlan {
 func NewOrganizationFromResponse(config Config, document documents.OrganizationResponse) Organization {
 	return newOrganizationFromResponse(config, document)
 }
+
+func NewSpaceFromResponse(config Config, document documents.SpaceResponse) Space {
+	return newSpaceFromResponse(config, document)
+}
