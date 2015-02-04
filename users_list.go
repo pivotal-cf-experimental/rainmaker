@@ -79,7 +79,7 @@ func (list UsersList) AllUsers(token string) ([]User, error) {
 
 	for l.HasPrevPage() {
 		var err error
-		l, err = list.Prev(token)
+		l, err = l.Prev(token)
 		if err != nil {
 			return []User{}, err
 		}
@@ -91,7 +91,7 @@ func (list UsersList) AllUsers(token string) ([]User, error) {
 
 	for l.HasNextPage() {
 		var err error
-		l, err = list.Next(token)
+		l, err = l.Next(token)
 		if err != nil {
 			return []User{}, err
 		}
