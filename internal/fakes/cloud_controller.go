@@ -9,17 +9,19 @@ import (
 )
 
 type CloudController struct {
-	server        *httptest.Server
-	Organizations *Organizations
-	Spaces        *Spaces
-	Users         *Users
+	server           *httptest.Server
+	Organizations    *Organizations
+	Spaces           *Spaces
+	Users            *Users
+	ServiceInstances *ServiceInstances
 }
 
 func NewCloudController() *CloudController {
 	fake := &CloudController{
-		Organizations: NewOrganizations(),
-		Spaces:        NewSpaces(),
-		Users:         NewUsers(),
+		Organizations:    NewOrganizations(),
+		Spaces:           NewSpaces(),
+		Users:            NewUsers(),
+		ServiceInstances: NewServiceInstances(),
 	}
 
 	router := mux.NewRouter()
@@ -40,6 +42,8 @@ func NewCloudController() *CloudController {
 	router.HandleFunc("/v2/users", fake.GetUsers).Methods("GET")
 	router.HandleFunc("/v2/users", fake.CreateUser).Methods("POST")
 	router.HandleFunc("/v2/users/{guid}", fake.GetUser).Methods("GET")
+	router.HandleFunc("/v2/service_instances", fake.CreateServiceInstance).Methods("POST")
+	router.HandleFunc("/v2/service_instances/{guid}", fake.GetServiceInstance).Methods("GET")
 
 	handler := fake.RequireToken(router)
 	fake.server = httptest.NewUnstartedServer(handler)

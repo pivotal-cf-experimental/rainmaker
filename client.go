@@ -13,18 +13,20 @@ import (
 )
 
 type Client struct {
-	Config        Config
-	Organizations *OrganizationsService
-	Spaces        *SpacesService
-	Users         *UsersService
+	Config           Config
+	Organizations    *OrganizationsService
+	Spaces           *SpacesService
+	Users            *UsersService
+	ServiceInstances *ServiceInstancesService
 }
 
 func NewClient(config Config) Client {
 	return Client{
-		Config:        config,
-		Organizations: NewOrganizationsService(config),
-		Spaces:        NewSpacesService(config),
-		Users:         NewUsersService(config),
+		Config:           config,
+		Organizations:    NewOrganizationsService(config),
+		Spaces:           NewSpacesService(config),
+		Users:            NewUsersService(config),
+		ServiceInstances: NewServiceInstancesService(config),
 	}
 }
 

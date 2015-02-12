@@ -29,6 +29,11 @@ var _ = Describe("Client", func() {
 		Expect(client.Spaces).NotTo(BeNil())
 	})
 
+	It("has a service instance service", func() {
+		Expect(client.ServiceInstances).To(BeAssignableToTypeOf(&rainmaker.ServiceInstancesService{}))
+		Expect(client.ServiceInstances).NotTo(BeNil())
+	})
+
 	Describe("makeRequest", func() {
 		Context("when an error occurs", func() {
 			It("returns a RequestBodyMarshalError when the request body cannot be marshalled", func() {
