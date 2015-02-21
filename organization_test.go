@@ -3,8 +3,8 @@ package rainmaker_test
 import (
 	"time"
 
-	"github.com/pivotal-golang/rainmaker"
-	"github.com/pivotal-golang/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

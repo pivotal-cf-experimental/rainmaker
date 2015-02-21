@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pivotal-golang/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 )
 
 func (fake *CloudController) CreateUser(w http.ResponseWriter, req *http.Request) {

@@ -3,7 +3,7 @@ package rainmaker
 import (
 	"net/url"
 
-	"github.com/pivotal-golang/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 )
 
 func NewRequestArguments(method, path, token string, body interface{}, statusCodes []int) requestArguments {

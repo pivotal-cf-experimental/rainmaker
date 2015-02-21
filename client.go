@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/pivotal-golang/rainmaker/internal/network"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/network"
 )
 
 type Client struct {

@@ -1,7 +1,7 @@
 package rainmaker_test
 
 import (
-	"github.com/pivotal-golang/rainmaker"
+	"github.com/pivotal-cf-experimental/rainmaker"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

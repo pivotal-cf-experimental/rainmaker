@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/pivotal-golang/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 )
 
 type SpacesService struct {

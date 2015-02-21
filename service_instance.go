@@ -1,6 +1,6 @@
 package rainmaker
 
-import "github.com/pivotal-golang/rainmaker/internal/documents"
+import "github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 
 type ServiceInstance struct {
 	GUID      string

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/pivotal-golang/rainmaker/internal/network"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/network"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/pivotal-golang/rainmaker"
+	"github.com/pivotal-cf-experimental/rainmaker"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
