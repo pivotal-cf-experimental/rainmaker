@@ -6,22 +6,23 @@ import (
 	"regexp"
 
 	"github.com/gorilla/mux"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 type CloudController struct {
 	server           *httptest.Server
-	Organizations    *Organizations
-	Spaces           *Spaces
-	Users            *Users
-	ServiceInstances *ServiceInstances
+	Organizations    *domain.Organizations
+	Spaces           *domain.Spaces
+	Users            *domain.Users
+	ServiceInstances *domain.ServiceInstances
 }
 
 func NewCloudController() *CloudController {
 	fake := &CloudController{
-		Organizations:    NewOrganizations(),
-		Spaces:           NewSpaces(),
-		Users:            NewUsers(),
-		ServiceInstances: NewServiceInstances(),
+		Organizations:    domain.NewOrganizations(),
+		Spaces:           domain.NewSpaces(),
+		Users:            domain.NewUsers(),
+		ServiceInstances: domain.NewServiceInstances(),
 	}
 
 	router := mux.NewRouter()

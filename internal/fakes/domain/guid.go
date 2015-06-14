@@ -1,4 +1,4 @@
-package fakes
+package domain
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
-func newGUID(prefix string) string {
+func NewGUID(prefix string) string {
 	guid, err := uuid.NewV4()
 	if err != nil {
 		panic(err)

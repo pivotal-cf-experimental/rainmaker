@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 func (fake *CloudController) getUsers(w http.ResponseWriter, req *http.Request) {
@@ -11,7 +13,7 @@ func (fake *CloudController) getUsers(w http.ResponseWriter, req *http.Request) 
 	pageNum := parseInt(query.Get("page"), 1)
 	perPage := parseInt(query.Get("results-per-page"), 10)
 
-	page := NewPage(fake.filteredUsers(query.Get("q")), req.URL.Path, pageNum, perPage)
+	page := domain.NewPage(fake.filteredUsers(query.Get("q")), req.URL.Path, pageNum, perPage)
 	response, err := json.Marshal(page)
 	if err != nil {
 		panic(err)
@@ -21,13 +23,13 @@ func (fake *CloudController) getUsers(w http.ResponseWriter, req *http.Request) 
 	w.Write(response)
 }
 
-func (fake *CloudController) filteredUsers(query string) *Users {
+func (fake *CloudController) filteredUsers(query string) *domain.Users {
 	switch {
 	case strings.Contains(query, "space_guid:"):
 		spaceGUID := strings.TrimPrefix(query, "space_guid:")
 		space, ok := fake.Spaces.Get(spaceGUID)
 		if !ok {
-			return NewUsers()
+			return domain.NewUsers()
 		}
 
 		return space.Developers

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 func (fake *CloudController) createOrganization(w http.ResponseWriter, req *http.Request) {
@@ -16,7 +17,7 @@ func (fake *CloudController) createOrganization(w http.ResponseWriter, req *http
 		panic(err)
 	}
 
-	organization := NewOrganization(newGUID("org"))
+	organization := domain.NewOrganization(domain.NewGUID("org"))
 	organization.Name = document.Name
 	organization.CreatedAt = now
 	organization.UpdatedAt = now

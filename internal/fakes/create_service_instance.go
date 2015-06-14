@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 func (fake *CloudController) createServiceInstance(w http.ResponseWriter, req *http.Request) {
@@ -16,7 +17,7 @@ func (fake *CloudController) createServiceInstance(w http.ResponseWriter, req *h
 	}
 
 	now := time.Now().UTC()
-	instance := NewServiceInstance(newGUID("service-instance"))
+	instance := domain.NewServiceInstance(domain.NewGUID("service-instance"))
 	instance.Name = document.Name
 	instance.PlanGUID = document.PlanGUID
 	instance.SpaceGUID = document.SpaceGUID

@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -206,9 +206,9 @@ var _ = Describe("UsersList", func() {
 	Describe("Associate", func() {
 		It("associates a user with the listed resource", func() {
 			spaceGUID := "space-abc"
-			fakeCloudController.Spaces.Add(fakes.Space{
+			fakeCloudController.Spaces.Add(domain.Space{
 				GUID:       spaceGUID,
-				Developers: fakes.NewUsers(),
+				Developers: domain.NewUsers(),
 			})
 
 			user, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)

@@ -1,4 +1,4 @@
-package fakes
+package domain
 
 import (
 	"encoding/json"

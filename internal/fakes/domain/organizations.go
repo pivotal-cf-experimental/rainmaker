@@ -1,4 +1,4 @@
-package fakes
+package domain
 
 type Organizations struct {
 	store map[string]Organization

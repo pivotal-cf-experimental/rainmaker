@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 func (fake *CloudController) createUser(w http.ResponseWriter, req *http.Request) {
@@ -16,7 +17,7 @@ func (fake *CloudController) createUser(w http.ResponseWriter, req *http.Request
 		panic(err)
 	}
 
-	user := NewUser(newGUID("user"))
+	user := domain.NewUser(domain.NewGUID("user"))
 	user.GUID = document.GUID
 	user.DefaultSpaceGUID = document.DefaultSpaceGUID
 	user.CreatedAt = now

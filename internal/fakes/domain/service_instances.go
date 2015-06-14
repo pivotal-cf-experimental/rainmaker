@@ -1,4 +1,4 @@
-package fakes
+package domain
 
 type ServiceInstances struct {
 	store map[string]ServiceInstance

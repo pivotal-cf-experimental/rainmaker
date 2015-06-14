@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"regexp"
+
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 func (fake *CloudController) getSpaceDevelopers(w http.ResponseWriter, req *http.Request) {
@@ -20,7 +22,7 @@ func (fake *CloudController) getSpaceDevelopers(w http.ResponseWriter, req *http
 		return
 	}
 
-	page := NewPage(space.Developers, req.URL.Path, pageNum, perPage)
+	page := domain.NewPage(space.Developers, req.URL.Path, pageNum, perPage)
 	response, err := json.Marshal(page)
 	if err != nil {
 		panic(err)

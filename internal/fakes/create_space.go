@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 func (fake *CloudController) createSpace(w http.ResponseWriter, req *http.Request) {
@@ -16,7 +17,7 @@ func (fake *CloudController) createSpace(w http.ResponseWriter, req *http.Reques
 	}
 	now := time.Now().UTC()
 
-	space := NewSpace(newGUID("space"))
+	space := domain.NewSpace(domain.NewGUID("space"))
 	space.Name = document.Name
 	space.OrganizationGUID = document.OrganizationGUID
 	space.CreatedAt = now

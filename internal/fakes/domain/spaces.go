@@ -1,4 +1,4 @@
-package fakes
+package domain
 
 type Spaces struct {
 	store map[string]Space
