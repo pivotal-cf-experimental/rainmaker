@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/organizations"
 )
 
 type CloudController struct {
@@ -26,16 +27,7 @@ func NewCloudController() *CloudController {
 	}
 
 	router := mux.NewRouter()
-	router.HandleFunc("/v2/organizations", fake.createOrganization).Methods("POST")
-	router.HandleFunc("/v2/organizations/{guid}", fake.getOrganization).Methods("GET")
-	router.HandleFunc("/v2/organizations/{guid}/users", fake.getOrganizationUsers).Methods("GET")
-	router.HandleFunc("/v2/organizations/{guid}/users/{user_guid}", fake.associateUserToOrganization).Methods("PUT")
-	router.HandleFunc("/v2/organizations/{guid}/billing_managers", fake.getOrganizationBillingManagers).Methods("GET")
-	router.HandleFunc("/v2/organizations/{guid}/billing_managers/{billing_manager_guid}", fake.associateBillingManagerToOrganization).Methods("PUT")
-	router.HandleFunc("/v2/organizations/{guid}/auditors", fake.getOrganizationAuditors).Methods("GET")
-	router.HandleFunc("/v2/organizations/{guid}/auditors/{auditor_guid}", fake.associateAuditorToOrganization).Methods("PUT")
-	router.HandleFunc("/v2/organizations/{guid}/managers", fake.getOrganizationManagers).Methods("GET")
-	router.HandleFunc("/v2/organizations/{guid}/managers/{manager_guid}", fake.associateManagerToOrganization).Methods("PUT")
+	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(fake.Organizations, fake.Users))
 	router.HandleFunc("/v2/spaces", fake.createSpace).Methods("POST")
 	router.HandleFunc("/v2/spaces/{guid}", fake.getSpace).Methods("GET")
 	router.HandleFunc("/v2/spaces/{guid}/developers/{developer_guid}", fake.associateDeveloperToSpace).Methods("PUT")

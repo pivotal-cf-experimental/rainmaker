@@ -1,11 +1,11 @@
-package fakes
+package common
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-func (fake *CloudController) notFound(w http.ResponseWriter) {
+func NotFound(w http.ResponseWriter) {
 	errorBody, err := json.Marshal(map[string]interface{}{
 		"code":        10000,
 		"description": "Unknown request",

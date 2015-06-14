@@ -1,24 +1,29 @@
-package fakes
+package organizations
 
 import (
 	"encoding/json"
 	"net/http"
 	"regexp"
 
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) getOrganizationAuditors(w http.ResponseWriter, req *http.Request) {
+type getAuditorsHandler struct {
+	organizations *domain.Organizations
+}
+
+func (h getAuditorsHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r := regexp.MustCompile(`^/v2/organizations/(.*)/auditors$`)
 	matches := r.FindStringSubmatch(req.URL.Path)
 
 	query := req.URL.Query()
-	pageNum := parseInt(query.Get("page"), 1)
-	perPage := parseInt(query.Get("results-per-page"), 10)
+	pageNum := common.ParseInt(query.Get("page"), 1)
+	perPage := common.ParseInt(query.Get("results-per-page"), 10)
 
-	org, ok := fake.Organizations.Get(matches[1])
+	org, ok := h.organizations.Get(matches[1])
 	if !ok {
-		fake.notFound(w)
+		common.NotFound(w)
 		return
 	}
 

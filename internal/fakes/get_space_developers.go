@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
@@ -13,12 +14,12 @@ func (fake *CloudController) getSpaceDevelopers(w http.ResponseWriter, req *http
 	matches := r.FindStringSubmatch(req.URL.Path)
 
 	query := req.URL.Query()
-	pageNum := parseInt(query.Get("page"), 1)
-	perPage := parseInt(query.Get("results-per-page"), 10)
+	pageNum := common.ParseInt(query.Get("page"), 1)
+	perPage := common.ParseInt(query.Get("results-per-page"), 10)
 
 	space, ok := fake.Spaces.Get(matches[1])
 	if !ok {
-		fake.notFound(w)
+		common.NotFound(w)
 		return
 	}
 

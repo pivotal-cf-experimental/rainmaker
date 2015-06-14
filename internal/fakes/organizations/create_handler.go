@@ -1,4 +1,4 @@
-package fakes
+package organizations
 
 import (
 	"encoding/json"
@@ -9,7 +9,11 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) createOrganization(w http.ResponseWriter, req *http.Request) {
+type createHandler struct {
+	organizations *domain.Organizations
+}
+
+func (h createHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var document documents.CreateOrganizationRequest
 	now := time.Now().UTC()
 	err := json.NewDecoder(req.Body).Decode(&document)
@@ -22,7 +26,7 @@ func (fake *CloudController) createOrganization(w http.ResponseWriter, req *http
 	organization.CreatedAt = now
 	organization.UpdatedAt = now
 
-	fake.Organizations.Add(organization)
+	h.organizations.Add(organization)
 
 	response, err := json.Marshal(organization)
 	if err != nil {

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
 )
 
 func (fake *CloudController) getUser(w http.ResponseWriter, req *http.Request) {
@@ -11,7 +13,7 @@ func (fake *CloudController) getUser(w http.ResponseWriter, req *http.Request) {
 
 	user, ok := fake.Users.Get(userGUID)
 	if !ok {
-		fake.notFound(w)
+		common.NotFound(w)
 		return
 	}
 

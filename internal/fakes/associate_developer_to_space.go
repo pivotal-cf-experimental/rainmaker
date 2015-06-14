@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"regexp"
+
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
 )
 
 func (fake *CloudController) associateDeveloperToSpace(w http.ResponseWriter, req *http.Request) {
@@ -12,13 +14,13 @@ func (fake *CloudController) associateDeveloperToSpace(w http.ResponseWriter, re
 
 	space, ok := fake.Spaces.Get(matches[1])
 	if !ok {
-		fake.notFound(w)
+		common.NotFound(w)
 		return
 	}
 
 	developer, ok := fake.Users.Get(matches[2])
 	if !ok {
-		fake.notFound(w)
+		common.NotFound(w)
 		return
 	}
 

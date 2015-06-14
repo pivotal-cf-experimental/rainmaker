@@ -1,8 +1,8 @@
-package fakes
+package common
 
 import "strconv"
 
-func parseInt(value string, defaultValue int) int {
+func ParseInt(value string, defaultValue int) int {
 	if value == "" {
 		return defaultValue
 	}

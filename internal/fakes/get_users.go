@@ -5,13 +5,14 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
 func (fake *CloudController) getUsers(w http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
-	pageNum := parseInt(query.Get("page"), 1)
-	perPage := parseInt(query.Get("results-per-page"), 10)
+	pageNum := common.ParseInt(query.Get("page"), 1)
+	perPage := common.ParseInt(query.Get("results-per-page"), 10)
 
 	page := domain.NewPage(fake.filteredUsers(query.Get("q")), req.URL.Path, pageNum, perPage)
 	response, err := json.Marshal(page)

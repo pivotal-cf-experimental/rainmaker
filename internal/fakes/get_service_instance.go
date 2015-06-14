@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
 )
 
 func (fake *CloudController) getServiceInstance(w http.ResponseWriter, req *http.Request) {
@@ -11,7 +13,7 @@ func (fake *CloudController) getServiceInstance(w http.ResponseWriter, req *http
 
 	instance, ok := fake.ServiceInstances.Get(instanceGUID)
 	if !ok {
-		fake.notFound(w)
+		common.NotFound(w)
 	}
 
 	response, err := json.Marshal(instance)
