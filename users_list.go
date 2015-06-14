@@ -75,7 +75,7 @@ func (list UsersList) Prev(token string) (UsersList, error) {
 
 func (list UsersList) AllUsers(token string) ([]User, error) {
 	l := list
-	users := make([]User, 0)
+	var users []User
 
 	for l.HasPrevPage() {
 		var err error
