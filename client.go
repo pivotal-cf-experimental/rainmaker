@@ -12,6 +12,11 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/network"
 )
 
+type Config struct {
+	SkipVerifySSL bool
+	Host          string
+}
+
 type Client struct {
 	Config           Config
 	Organizations    *OrganizationsService
