@@ -54,7 +54,7 @@ var _ = Describe("Fetch all the users of a space", func() {
 		space, err := client.Spaces.Create("my-space", org.GUID, token)
 		Expect(err).NotTo(HaveOccurred())
 
-		for _ = range make([]int, 150, 150) {
+		for i := 0; i < 150; i++ {
 			user, err := client.Users.Create(NewGUID("user"), token)
 			Expect(err).NotTo(HaveOccurred())
 
