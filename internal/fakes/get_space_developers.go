@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-func (fake *CloudController) GetSpaceDevelopers(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) getSpaceDevelopers(w http.ResponseWriter, req *http.Request) {
 	r := regexp.MustCompile(`^/v2/spaces/(.*)/developers$`)
 	matches := r.FindStringSubmatch(req.URL.Path)
 
@@ -16,7 +16,7 @@ func (fake *CloudController) GetSpaceDevelopers(w http.ResponseWriter, req *http
 
 	space, ok := fake.Spaces.Get(matches[1])
 	if !ok {
-		fake.NotFound(w)
+		fake.notFound(w)
 		return
 	}
 

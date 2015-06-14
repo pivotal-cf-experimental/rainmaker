@@ -8,7 +8,7 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 )
 
-func (fake *CloudController) CreateOrganization(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) createOrganization(w http.ResponseWriter, req *http.Request) {
 	var document documents.CreateOrganizationRequest
 	now := time.Now().UTC()
 	err := json.NewDecoder(req.Body).Decode(&document)
@@ -16,7 +16,7 @@ func (fake *CloudController) CreateOrganization(w http.ResponseWriter, req *http
 		panic(err)
 	}
 
-	organization := NewOrganization(NewGUID("org"))
+	organization := NewOrganization(newGUID("org"))
 	organization.Name = document.Name
 	organization.CreatedAt = now
 	organization.UpdatedAt = now

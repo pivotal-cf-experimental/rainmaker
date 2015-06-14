@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-func (fake *CloudController) GetSpace(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) getSpace(w http.ResponseWriter, req *http.Request) {
 	spaceGUID := strings.TrimPrefix(req.URL.Path, "/v2/spaces/")
 
 	space, ok := fake.Spaces.Get(spaceGUID)
 	if !ok {
-		fake.NotFound(w)
+		fake.notFound(w)
 		return
 	}
 

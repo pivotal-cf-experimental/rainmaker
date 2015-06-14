@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-func (fake *CloudController) GetOrganizationBillingManagers(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) getOrganizationBillingManagers(w http.ResponseWriter, req *http.Request) {
 	r := regexp.MustCompile(`^/v2/organizations/(.*)/billing_managers$`)
 	matches := r.FindStringSubmatch(req.URL.Path)
 
@@ -16,7 +16,7 @@ func (fake *CloudController) GetOrganizationBillingManagers(w http.ResponseWrite
 
 	org, ok := fake.Organizations.Get(matches[1])
 	if !ok {
-		fake.NotFound(w)
+		fake.notFound(w)
 		return
 	}
 

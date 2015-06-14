@@ -8,7 +8,7 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 )
 
-func (fake *CloudController) CreateSpace(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) createSpace(w http.ResponseWriter, req *http.Request) {
 	var document documents.CreateSpaceRequest
 	err := json.NewDecoder(req.Body).Decode(&document)
 	if err != nil {
@@ -16,7 +16,7 @@ func (fake *CloudController) CreateSpace(w http.ResponseWriter, req *http.Reques
 	}
 	now := time.Now().UTC()
 
-	space := NewSpace(NewGUID("space"))
+	space := NewSpace(newGUID("space"))
 	space.Name = document.Name
 	space.OrganizationGUID = document.OrganizationGUID
 	space.CreatedAt = now

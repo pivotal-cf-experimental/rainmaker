@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-func (fake *CloudController) GetUser(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) getUser(w http.ResponseWriter, req *http.Request) {
 	userGUID := strings.TrimPrefix(req.URL.Path, "/v2/users/")
 
 	user, ok := fake.Users.Get(userGUID)
 	if !ok {
-		fake.NotFound(w)
+		fake.notFound(w)
 		return
 	}
 

@@ -8,7 +8,7 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 )
 
-func (fake *CloudController) CreateUser(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) createUser(w http.ResponseWriter, req *http.Request) {
 	var document documents.CreateUserRequest
 	now := time.Now().UTC()
 	err := json.NewDecoder(req.Body).Decode(&document)
@@ -16,7 +16,7 @@ func (fake *CloudController) CreateUser(w http.ResponseWriter, req *http.Request
 		panic(err)
 	}
 
-	user := NewUser(NewGUID("user"))
+	user := NewUser(newGUID("user"))
 	user.GUID = document.GUID
 	user.DefaultSpaceGUID = document.DefaultSpaceGUID
 	user.CreatedAt = now

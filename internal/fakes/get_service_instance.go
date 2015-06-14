@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-func (fake *CloudController) GetServiceInstance(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) getServiceInstance(w http.ResponseWriter, req *http.Request) {
 	instanceGUID := strings.TrimPrefix(req.URL.Path, "/v2/service_instances/")
 
 	instance, ok := fake.ServiceInstances.Get(instanceGUID)
 	if !ok {
-		fake.NotFound(w)
+		fake.notFound(w)
 	}
 
 	response, err := json.Marshal(instance)

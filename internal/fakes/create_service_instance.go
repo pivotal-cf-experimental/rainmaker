@@ -8,7 +8,7 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 )
 
-func (fake *CloudController) CreateServiceInstance(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) createServiceInstance(w http.ResponseWriter, req *http.Request) {
 	var document documents.CreateServiceInstanceRequest
 	err := json.NewDecoder(req.Body).Decode(&document)
 	if err != nil {
@@ -16,7 +16,7 @@ func (fake *CloudController) CreateServiceInstance(w http.ResponseWriter, req *h
 	}
 
 	now := time.Now().UTC()
-	instance := NewServiceInstance(NewGUID("service-instance"))
+	instance := NewServiceInstance(newGUID("service-instance"))
 	instance.Name = document.Name
 	instance.PlanGUID = document.PlanGUID
 	instance.SpaceGUID = document.SpaceGUID

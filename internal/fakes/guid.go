@@ -6,7 +6,7 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
-func NewGUID(prefix string) string {
+func newGUID(prefix string) string {
 	guid, err := uuid.NewV4()
 	if err != nil {
 		panic(err)

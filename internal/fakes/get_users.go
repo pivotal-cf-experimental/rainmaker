@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (fake *CloudController) GetUsers(w http.ResponseWriter, req *http.Request) {
+func (fake *CloudController) getUsers(w http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
 	pageNum := parseInt(query.Get("page"), 1)
 	perPage := parseInt(query.Get("results-per-page"), 10)
