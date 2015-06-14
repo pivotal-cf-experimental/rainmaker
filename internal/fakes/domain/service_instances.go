@@ -18,3 +18,7 @@ func (instances *ServiceInstances) Get(guid string) (ServiceInstance, bool) {
 	instance, ok := instances.store[guid]
 	return instance, ok
 }
+
+func (instances *ServiceInstances) Clear() {
+	instances.store = make(map[string]ServiceInstance)
+}

@@ -28,18 +28,25 @@ func NewCloudController() *CloudController {
 
 	router := mux.NewRouter()
 	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(fake.Organizations, fake.Users))
+
+	// TODO: pull out into spaces pkg
 	router.HandleFunc("/v2/spaces", fake.createSpace).Methods("POST")
 	router.HandleFunc("/v2/spaces/{guid}", fake.getSpace).Methods("GET")
 	router.HandleFunc("/v2/spaces/{guid}/developers/{developer_guid}", fake.associateDeveloperToSpace).Methods("PUT")
 	router.HandleFunc("/v2/spaces/{guid}/developers", fake.getSpaceDevelopers).Methods("GET")
+
+	// TODO: pull out into users pkg
 	router.HandleFunc("/v2/users", fake.getUsers).Methods("GET")
 	router.HandleFunc("/v2/users", fake.createUser).Methods("POST")
 	router.HandleFunc("/v2/users/{guid}", fake.getUser).Methods("GET")
+
+	// TODO: pull out into service_instances pkg
 	router.HandleFunc("/v2/service_instances", fake.createServiceInstance).Methods("POST")
 	router.HandleFunc("/v2/service_instances/{guid}", fake.getServiceInstance).Methods("GET")
 
 	handler := fake.RequireToken(router)
 	fake.server = httptest.NewUnstartedServer(handler)
+
 	return fake
 }
 
@@ -59,6 +66,7 @@ func (fake *CloudController) Reset() {
 	fake.Organizations.Clear()
 	fake.Spaces.Clear()
 	fake.Users.Clear()
+	fake.ServiceInstances.Clear()
 }
 
 func (fake *CloudController) RequireToken(handler http.Handler) http.Handler {
