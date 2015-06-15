@@ -1,4 +1,4 @@
-package fakes
+package spaces
 
 import (
 	"encoding/json"
@@ -9,7 +9,11 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) getSpaceDevelopers(w http.ResponseWriter, req *http.Request) {
+type getDevelopersHandler struct {
+	spaces *domain.Spaces
+}
+
+func (h getDevelopersHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r := regexp.MustCompile(`^/v2/spaces/(.*)/developers$`)
 	matches := r.FindStringSubmatch(req.URL.Path)
 
@@ -17,7 +21,7 @@ func (fake *CloudController) getSpaceDevelopers(w http.ResponseWriter, req *http
 	pageNum := common.ParseInt(query.Get("page"), 1)
 	perPage := common.ParseInt(query.Get("results-per-page"), 10)
 
-	space, ok := fake.Spaces.Get(matches[1])
+	space, ok := h.spaces.Get(matches[1])
 	if !ok {
 		common.NotFound(w)
 		return

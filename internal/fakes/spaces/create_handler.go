@@ -1,4 +1,4 @@
-package fakes
+package spaces
 
 import (
 	"encoding/json"
@@ -9,7 +9,11 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) createSpace(w http.ResponseWriter, req *http.Request) {
+type createHandler struct {
+	spaces *domain.Spaces
+}
+
+func (h createHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var document documents.CreateSpaceRequest
 	err := json.NewDecoder(req.Body).Decode(&document)
 	if err != nil {
@@ -23,7 +27,7 @@ func (fake *CloudController) createSpace(w http.ResponseWriter, req *http.Reques
 	space.CreatedAt = now
 	space.UpdatedAt = now
 
-	fake.Spaces.Add(space)
+	h.spaces.Add(space)
 
 	response, err := json.Marshal(space)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/organizations"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/spaces"
 )
 
 type CloudController struct {
@@ -28,12 +29,7 @@ func NewCloudController() *CloudController {
 
 	router := mux.NewRouter()
 	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(fake.Organizations, fake.Users))
-
-	// TODO: pull out into spaces pkg
-	router.HandleFunc("/v2/spaces", fake.createSpace).Methods("POST")
-	router.HandleFunc("/v2/spaces/{guid}", fake.getSpace).Methods("GET")
-	router.HandleFunc("/v2/spaces/{guid}/developers/{developer_guid}", fake.associateDeveloperToSpace).Methods("PUT")
-	router.HandleFunc("/v2/spaces/{guid}/developers", fake.getSpaceDevelopers).Methods("GET")
+	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(fake.Spaces, fake.Users))
 
 	// TODO: pull out into users pkg
 	router.HandleFunc("/v2/users", fake.getUsers).Methods("GET")

@@ -1,4 +1,4 @@
-package fakes
+package spaces
 
 import (
 	"encoding/json"
@@ -6,19 +6,25 @@ import (
 	"regexp"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) associateDeveloperToSpace(w http.ResponseWriter, req *http.Request) {
+type associateDeveloperHandler struct {
+	spaces *domain.Spaces
+	users  *domain.Users
+}
+
+func (h associateDeveloperHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	r := regexp.MustCompile(`^/v2/spaces/(.*)/developers/(.*)$`)
 	matches := r.FindStringSubmatch(req.URL.Path)
 
-	space, ok := fake.Spaces.Get(matches[1])
+	space, ok := h.spaces.Get(matches[1])
 	if !ok {
 		common.NotFound(w)
 		return
 	}
 
-	developer, ok := fake.Users.Get(matches[2])
+	developer, ok := h.users.Get(matches[2])
 	if !ok {
 		common.NotFound(w)
 		return
