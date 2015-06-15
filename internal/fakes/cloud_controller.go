@@ -22,7 +22,7 @@ type CloudController struct {
 }
 
 func NewCloudController() *CloudController {
-	fake := &CloudController{
+	cc := &CloudController{
 		Organizations:    domain.NewOrganizations(),
 		Spaces:           domain.NewSpaces(),
 		Users:            domain.NewUsers(),
@@ -30,37 +30,37 @@ func NewCloudController() *CloudController {
 	}
 
 	router := mux.NewRouter()
-	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(fake.Organizations, fake.Users))
-	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(fake.Spaces, fake.Users))
-	router.Handle("/v2/users{anything:.*}", users.NewRouter(fake.Users, fake.Spaces))
-	router.Handle("/v2/service_instances{anything:.*}", service_instances.NewRouter(fake.ServiceInstances))
+	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(cc.Organizations, cc.Users))
+	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(cc.Spaces, cc.Users))
+	router.Handle("/v2/users{anything:.*}", users.NewRouter(cc.Users, cc.Spaces))
+	router.Handle("/v2/service_instances{anything:.*}", service_instances.NewRouter(cc.ServiceInstances))
 
-	handler := fake.RequireToken(router)
-	fake.server = httptest.NewUnstartedServer(handler)
+	handler := cc.RequireToken(router)
+	cc.server = httptest.NewUnstartedServer(handler)
 
-	return fake
+	return cc
 }
 
-func (fake *CloudController) Start() {
-	fake.server.Start()
+func (cc *CloudController) Start() {
+	cc.server.Start()
 }
 
-func (fake *CloudController) Close() {
-	fake.server.Close()
+func (cc *CloudController) Close() {
+	cc.server.Close()
 }
 
-func (fake *CloudController) URL() string {
-	return fake.server.URL
+func (cc *CloudController) URL() string {
+	return cc.server.URL
 }
 
-func (fake *CloudController) Reset() {
-	fake.Organizations.Clear()
-	fake.Spaces.Clear()
-	fake.Users.Clear()
-	fake.ServiceInstances.Clear()
+func (cc *CloudController) Reset() {
+	cc.Organizations.Clear()
+	cc.Spaces.Clear()
+	cc.Users.Clear()
+	cc.ServiceInstances.Clear()
 }
 
-func (fake *CloudController) RequireToken(handler http.Handler) http.Handler {
+func (cc *CloudController) RequireToken(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ok, err := regexp.MatchString(`Bearer .+`, req.Header.Get("Authorization"))
 		if err != nil {
