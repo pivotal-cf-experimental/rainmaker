@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/organizations"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/service_instances"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/spaces"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/users"
 )
@@ -32,10 +33,7 @@ func NewCloudController() *CloudController {
 	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(fake.Organizations, fake.Users))
 	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(fake.Spaces, fake.Users))
 	router.Handle("/v2/users{anything:.*}", users.NewRouter(fake.Users, fake.Spaces))
-
-	// TODO: pull out into service_instances pkg
-	router.HandleFunc("/v2/service_instances", fake.createServiceInstance).Methods("POST")
-	router.HandleFunc("/v2/service_instances/{guid}", fake.getServiceInstance).Methods("GET")
+	router.Handle("/v2/service_instances{anything:.*}", service_instances.NewRouter(fake.ServiceInstances))
 
 	handler := fake.RequireToken(router)
 	fake.server = httptest.NewUnstartedServer(handler)

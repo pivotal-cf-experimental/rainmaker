@@ -1,4 +1,4 @@
-package fakes
+package service_instances
 
 import (
 	"encoding/json"
@@ -9,7 +9,11 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) createServiceInstance(w http.ResponseWriter, req *http.Request) {
+type createHandler struct {
+	serviceInstances *domain.ServiceInstances
+}
+
+func (h createHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var document documents.CreateServiceInstanceRequest
 	err := json.NewDecoder(req.Body).Decode(&document)
 	if err != nil {
@@ -24,7 +28,7 @@ func (fake *CloudController) createServiceInstance(w http.ResponseWriter, req *h
 	instance.CreatedAt = now
 	instance.UpdatedAt = now
 
-	fake.ServiceInstances.Add(instance)
+	h.serviceInstances.Add(instance)
 
 	response, err := json.Marshal(instance)
 	if err != nil {
