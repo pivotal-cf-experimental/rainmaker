@@ -35,7 +35,7 @@ func NewCloudController() *CloudController {
 	router.Handle("/v2/users{anything:.*}", users.NewRouter(cc.Users, cc.Spaces))
 	router.Handle("/v2/service_instances{anything:.*}", service_instances.NewRouter(cc.ServiceInstances))
 
-	handler := cc.RequireToken(router)
+	handler := cc.requireToken(router)
 	cc.server = httptest.NewUnstartedServer(handler)
 
 	return cc
@@ -60,7 +60,7 @@ func (cc *CloudController) Reset() {
 	cc.ServiceInstances.Clear()
 }
 
-func (cc *CloudController) RequireToken(handler http.Handler) http.Handler {
+func (cc *CloudController) requireToken(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ok, err := regexp.MatchString(`Bearer .+`, req.Header.Get("Authorization"))
 		if err != nil {
