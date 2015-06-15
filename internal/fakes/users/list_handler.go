@@ -1,4 +1,4 @@
-package fakes
+package users
 
 import (
 	"encoding/json"
@@ -9,12 +9,17 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) getUsers(w http.ResponseWriter, req *http.Request) {
+type listHandler struct {
+	users  *domain.Users
+	spaces *domain.Spaces
+}
+
+func (h listHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
 	pageNum := common.ParseInt(query.Get("page"), 1)
 	perPage := common.ParseInt(query.Get("results-per-page"), 10)
 
-	page := domain.NewPage(fake.filteredUsers(query.Get("q")), req.URL.Path, pageNum, perPage)
+	page := domain.NewPage(h.filteredUsers(query.Get("q")), req.URL.Path, pageNum, perPage)
 	response, err := json.Marshal(page)
 	if err != nil {
 		panic(err)
@@ -24,17 +29,17 @@ func (fake *CloudController) getUsers(w http.ResponseWriter, req *http.Request) 
 	w.Write(response)
 }
 
-func (fake *CloudController) filteredUsers(query string) *domain.Users {
+func (h listHandler) filteredUsers(query string) *domain.Users {
 	switch {
 	case strings.Contains(query, "space_guid:"):
 		spaceGUID := strings.TrimPrefix(query, "space_guid:")
-		space, ok := fake.Spaces.Get(spaceGUID)
+		space, ok := h.spaces.Get(spaceGUID)
 		if !ok {
 			return domain.NewUsers()
 		}
 
 		return space.Developers
 	default:
-		return fake.Users
+		return h.users
 	}
 }

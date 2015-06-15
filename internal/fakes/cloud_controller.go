@@ -9,6 +9,7 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/organizations"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/spaces"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/users"
 )
 
 type CloudController struct {
@@ -30,11 +31,7 @@ func NewCloudController() *CloudController {
 	router := mux.NewRouter()
 	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(fake.Organizations, fake.Users))
 	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(fake.Spaces, fake.Users))
-
-	// TODO: pull out into users pkg
-	router.HandleFunc("/v2/users", fake.getUsers).Methods("GET")
-	router.HandleFunc("/v2/users", fake.createUser).Methods("POST")
-	router.HandleFunc("/v2/users/{guid}", fake.getUser).Methods("GET")
+	router.Handle("/v2/users{anything:.*}", users.NewRouter(fake.Users, fake.Spaces))
 
 	// TODO: pull out into service_instances pkg
 	router.HandleFunc("/v2/service_instances", fake.createServiceInstance).Methods("POST")

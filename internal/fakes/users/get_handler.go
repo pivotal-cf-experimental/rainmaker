@@ -1,4 +1,4 @@
-package fakes
+package users
 
 import (
 	"encoding/json"
@@ -6,12 +6,17 @@ import (
 	"strings"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/common"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func (fake *CloudController) getUser(w http.ResponseWriter, req *http.Request) {
+type getHandler struct {
+	users *domain.Users
+}
+
+func (h getHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	userGUID := strings.TrimPrefix(req.URL.Path, "/v2/users/")
 
-	user, ok := fake.Users.Get(userGUID)
+	user, ok := h.users.Get(userGUID)
 	if !ok {
 		common.NotFound(w)
 		return
