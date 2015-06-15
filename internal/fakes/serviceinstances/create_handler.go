@@ -1,4 +1,4 @@
-package service_instances
+package serviceinstances
 
 import (
 	"encoding/json"
