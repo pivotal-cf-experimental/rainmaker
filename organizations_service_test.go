@@ -24,9 +24,7 @@ var _ = Describe("OrganizationsService", func() {
 		service = client.Organizations
 
 		organization, err = service.Create("test-org", token)
-		if err != nil {
-			panic(err)
-		}
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("Create", func() {
@@ -60,32 +58,22 @@ var _ = Describe("OrganizationsService", func() {
 			usersService := rainmaker.NewUsersService(config)
 
 			user1, err = usersService.Create("user-123", token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			user2, err = usersService.Create("user-456", token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			user3, err = usersService.Create("user-789", token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		Describe("ListUsers", func() {
 			BeforeEach(func() {
 				err := organization.Users.Associate(user1.GUID, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 
 				err = organization.Users.Associate(user2.GUID, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns the users belonging to the organization", func() {
@@ -114,14 +102,10 @@ var _ = Describe("OrganizationsService", func() {
 		Describe("ListBillingManagers", func() {
 			BeforeEach(func() {
 				err := organization.BillingManagers.Associate(user2.GUID, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 
 				err = organization.BillingManagers.Associate(user3.GUID, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns the billing managers belonging to the organization", func() {
@@ -143,14 +127,10 @@ var _ = Describe("OrganizationsService", func() {
 		Describe("ListAuditors", func() {
 			BeforeEach(func() {
 				err := organization.Auditors.Associate(user1.GUID, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 
 				err = organization.Auditors.Associate(user3.GUID, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns the auditors belonging to the organization", func() {
@@ -172,9 +152,7 @@ var _ = Describe("OrganizationsService", func() {
 		Describe("ListManagers", func() {
 			BeforeEach(func() {
 				err := organization.Managers.Associate(user3.GUID, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns the managers belonging to the organization", func() {

@@ -23,9 +23,7 @@ var _ = Describe("SpacesService", func() {
 		spaceName = "my-space"
 
 		org, err = rainmaker.NewOrganizationsService(config).Create("org-123", token)
-		if err != nil {
-			panic(err)
-		}
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("Create/Get", func() {
@@ -61,25 +59,16 @@ var _ = Describe("SpacesService", func() {
 			var err error
 
 			user, err = rainmaker.NewUsersService(config).Create("user-abc", token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			_, err = rainmaker.NewUsersService(config).Create("user-xyz", token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			space, err = service.Create(spaceName, org.GUID, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			err = space.Developers.Associate(user.GUID, token)
-			if err != nil {
-				panic(err)
-			}
-
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("returns the users belonging to the space", func() {

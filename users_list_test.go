@@ -32,14 +32,10 @@ var _ = Describe("UsersList", func() {
 		It("adds a user to the list", func() {
 			user, err := list.Create(rainmaker.User{GUID: "user-123"}, token)
 			Expect(err).NotTo(HaveOccurred())
-
 			Expect(user.GUID).To(Equal("user-123"))
 
 			err = list.Fetch(token)
-			if err != nil {
-				panic(err)
-			}
-
+			Expect(err).NotTo(HaveOccurred())
 			Expect(list.Users).To(HaveLen(1))
 			Expect(list.Users[0].GUID).To(Equal("user-123"))
 		})
@@ -48,19 +44,13 @@ var _ = Describe("UsersList", func() {
 	Describe("Next", func() {
 		BeforeEach(func() {
 			_, err := list.Create(rainmaker.User{GUID: "user-123"}, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			_, err = list.Create(rainmaker.User{GUID: "user-456"}, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			_, err = list.Create(rainmaker.User{GUID: "user-789"}, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("returns the next UserList result for the paginated set", func() {
@@ -97,19 +87,13 @@ var _ = Describe("UsersList", func() {
 	Describe("Prev", func() {
 		BeforeEach(func() {
 			_, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			_, err = list.Create(rainmaker.User{GUID: "user-def"}, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			_, err = list.Create(rainmaker.User{GUID: "user-xyz"}, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("returns the previous UserList result for the paginated set", func() {
@@ -119,9 +103,7 @@ var _ = Describe("UsersList", func() {
 
 			list := rainmaker.NewUsersList(config, rainmaker.NewRequestPlan(path, query))
 			err := list.Fetch(token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(list.Users).To(HaveLen(1))
 			Expect(list.HasNextPage()).To(BeFalse())
@@ -174,9 +156,7 @@ var _ = Describe("UsersList", func() {
 		BeforeEach(func() {
 			for i := 0; i < 10; i++ {
 				_, err := list.Create(rainmaker.User{GUID: fmt.Sprintf("user-%d", i)}, token)
-				if err != nil {
-					panic(err)
-				}
+				Expect(err).NotTo(HaveOccurred())
 			}
 		})
 
@@ -219,9 +199,7 @@ var _ = Describe("UsersList", func() {
 			})
 
 			user, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)
-			if err != nil {
-				panic(err)
-			}
+			Expect(err).NotTo(HaveOccurred())
 
 			list = rainmaker.NewUsersList(config, rainmaker.NewRequestPlan("/v2/spaces/"+spaceGUID+"/developers", url.Values{}))
 			err = list.Associate(user.GUID, token)
