@@ -1,6 +1,7 @@
 package rainmaker_test
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker"
@@ -171,19 +172,11 @@ var _ = Describe("UsersList", func() {
 
 	Describe("AllUsers", func() {
 		BeforeEach(func() {
-			_, err := list.Create(rainmaker.User{GUID: "user-abc"}, token)
-			if err != nil {
-				panic(err)
-			}
-
-			_, err = list.Create(rainmaker.User{GUID: "user-def"}, token)
-			if err != nil {
-				panic(err)
-			}
-
-			_, err = list.Create(rainmaker.User{GUID: "user-xyz"}, token)
-			if err != nil {
-				panic(err)
+			for i := 0; i < 10; i++ {
+				_, err := list.Create(rainmaker.User{GUID: fmt.Sprintf("user-%d", i)}, token)
+				if err != nil {
+					panic(err)
+				}
 			}
 		})
 
@@ -191,15 +184,29 @@ var _ = Describe("UsersList", func() {
 			err := list.Fetch(token)
 			Expect(err).NotTo(HaveOccurred())
 
+			list, err = list.Next(token)
+			Expect(err).NotTo(HaveOccurred())
+
 			users, err := list.AllUsers(token)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(users).To(HaveLen(3))
+			Expect(users).To(HaveLen(10))
 			var guids []string
 			for _, user := range users {
 				guids = append(guids, user.GUID)
 			}
-			Expect(guids).To(ConsistOf([]string{"user-abc", "user-def", "user-xyz"}))
+			Expect(guids).To(ConsistOf([]string{
+				"user-0",
+				"user-1",
+				"user-2",
+				"user-3",
+				"user-4",
+				"user-5",
+				"user-6",
+				"user-7",
+				"user-8",
+				"user-9",
+			}))
 		})
 	})
 

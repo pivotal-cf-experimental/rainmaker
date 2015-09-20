@@ -89,6 +89,7 @@ func (list UsersList) AllUsers(token string) ([]User, error) {
 
 	users = append(users, list.Users...)
 
+	l = list
 	for l.HasNextPage() {
 		var err error
 		l, err = l.Next(token)
