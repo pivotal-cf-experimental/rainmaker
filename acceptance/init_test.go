@@ -22,7 +22,7 @@ func NewGUID(prefix string) string {
 	}
 
 	if prefix != "" {
-		return fmt.Sprintf("warrant-%s-%s", prefix, guid.String())
+		return fmt.Sprintf("rainmaker-%s-%s", prefix, guid.String())
 	}
 
 	return guid.String()

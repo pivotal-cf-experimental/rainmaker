@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/network"
 )
 
 type UsersList struct {
@@ -105,19 +106,18 @@ func (list UsersList) AllUsers(token string) ([]User, error) {
 
 func (list UsersList) Create(user User, token string) (User, error) {
 	var document documents.UserResponse
-
-	_, body, err := NewClient(list.config).makeRequest(requestArguments{
-		Method: "POST",
-		Path:   list.plan.Path,
-		Token:  token,
-		Body:   user,
+	resp, err := newNetworkClient(list.config).MakeRequest(network.Request{
+		Method:        "POST",
+		Path:          list.plan.Path,
+		Authorization: network.NewTokenAuthorization(token),
+		Body:          network.NewJSONRequestBody(user),
 		AcceptableStatusCodes: []int{http.StatusCreated},
 	})
 	if err != nil {
 		return User{}, err
 	}
 
-	err = json.Unmarshal(body, &document)
+	err = json.Unmarshal(resp.Body, &document)
 	if err != nil {
 		panic(err)
 	}
@@ -126,10 +126,10 @@ func (list UsersList) Create(user User, token string) (User, error) {
 }
 
 func (list UsersList) Associate(userGUID, token string) error {
-	_, _, err := NewClient(list.config).makeRequest(requestArguments{
-		Method: "PUT",
-		Path:   path.Join(list.plan.Path, userGUID),
-		Token:  token,
+	_, err := newNetworkClient(list.config).MakeRequest(network.Request{
+		Method:                "PUT",
+		Path:                  path.Join(list.plan.Path, userGUID),
+		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusCreated},
 	})
 
@@ -137,11 +137,15 @@ func (list UsersList) Associate(userGUID, token string) error {
 }
 
 func (list *UsersList) Fetch(token string) error {
-	_, body, err := NewClient(list.config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   list.plan.Path,
-		Query:  list.plan.Query,
-		Token:  token,
+	u := url.URL{
+		Path:     list.plan.Path,
+		RawQuery: list.plan.Query.Encode(),
+	}
+
+	resp, err := newNetworkClient(list.config).MakeRequest(network.Request{
+		Method:                "GET",
+		Path:                  u.String(),
+		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
@@ -149,7 +153,7 @@ func (list *UsersList) Fetch(token string) error {
 	}
 
 	var response documents.UsersListResponse
-	err = json.Unmarshal(body, &response)
+	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
 		panic(err)
 	}

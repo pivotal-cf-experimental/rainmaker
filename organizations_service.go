@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/network"
 )
 
 type OrganizationsService struct {
@@ -19,13 +20,13 @@ func NewOrganizationsService(config Config) *OrganizationsService {
 }
 
 func (service OrganizationsService) Create(name string, token string) (Organization, error) {
-	_, body, err := NewClient(service.config).makeRequest(requestArguments{
+	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method: "POST",
 		Path:   "/v2/organizations",
-		Body: documents.CreateOrganizationRequest{
+		Body: network.NewJSONRequestBody(documents.CreateOrganizationRequest{
 			Name: name,
-		},
-		Token: token,
+		}),
+		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusCreated},
 	})
 	if err != nil {
@@ -33,7 +34,7 @@ func (service OrganizationsService) Create(name string, token string) (Organizat
 	}
 
 	var response documents.OrganizationResponse
-	err = json.Unmarshal(body, &response)
+	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
 		panic(err)
 	}
@@ -42,10 +43,10 @@ func (service OrganizationsService) Create(name string, token string) (Organizat
 }
 
 func (service OrganizationsService) Get(guid, token string) (Organization, error) {
-	_, body, err := NewClient(service.config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/organizations/" + guid,
-		Token:  token,
+	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
+		Method:                "GET",
+		Path:                  "/v2/organizations/" + guid,
+		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
@@ -53,7 +54,7 @@ func (service OrganizationsService) Get(guid, token string) (Organization, error
 	}
 
 	var response documents.OrganizationResponse
-	err = json.Unmarshal(body, &response)
+	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
 		panic(err)
 	}
@@ -64,8 +65,11 @@ func (service OrganizationsService) Get(guid, token string) (Organization, error
 func (service OrganizationsService) ListUsers(guid, token string) (UsersList, error) {
 	list := NewUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/users", url.Values{}))
 	err := list.Fetch(token)
+	if err != nil {
+		return UsersList{}, translateError(err)
+	}
 
-	return list, err
+	return list, nil
 }
 
 func (service OrganizationsService) ListBillingManagers(guid, token string) (UsersList, error) {

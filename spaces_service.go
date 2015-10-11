@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/network"
 )
 
 type SpacesService struct {
@@ -20,14 +21,14 @@ func NewSpacesService(config Config) *SpacesService {
 }
 
 func (service SpacesService) Create(name, orgGUID, token string) (Space, error) {
-	_, body, err := NewClient(service.config).makeRequest(requestArguments{
+	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method: "POST",
 		Path:   "/v2/spaces",
-		Body: documents.CreateSpaceRequest{
+		Body: network.NewJSONRequestBody(documents.CreateSpaceRequest{
 			Name:             name,
 			OrganizationGUID: orgGUID,
-		},
-		Token: token,
+		}),
+		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusCreated},
 	})
 	if err != nil {
@@ -35,7 +36,7 @@ func (service SpacesService) Create(name, orgGUID, token string) (Space, error) 
 	}
 
 	var response documents.SpaceResponse
-	err = json.Unmarshal(body, &response)
+	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
 		panic(err)
 	}
@@ -44,10 +45,10 @@ func (service SpacesService) Create(name, orgGUID, token string) (Space, error) 
 }
 
 func (service SpacesService) Get(guid, token string) (Space, error) {
-	_, body, err := NewClient(service.config).makeRequest(requestArguments{
-		Method: "GET",
-		Path:   "/v2/spaces/" + guid,
-		Token:  token,
+	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
+		Method:                "GET",
+		Path:                  "/v2/spaces/" + guid,
+		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
@@ -55,7 +56,7 @@ func (service SpacesService) Get(guid, token string) (Space, error) {
 	}
 
 	var response documents.SpaceResponse
-	err = json.Unmarshal(body, &response)
+	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
 		panic(err)
 	}

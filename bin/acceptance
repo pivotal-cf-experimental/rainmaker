@@ -12,8 +12,7 @@ export CC_HOST=https://api.$DOMAIN
 
 cf logout
 cf api $CC_HOST --skip-ssl-validation
-cf auth admin admin
-cf orgs | grep "^org-" | sort -r | xargs -n 1 cf delete-org -f
-cf orgs | grep "^warrant-org-" | sort -r | xargs -n 1 cf delete-org -f
+cf auth $CF_ADMIN_USERNAME $CF_ADMIN_PASSWORD
+cf orgs | grep "^rainmaker-org-" | sort -r | xargs -n 1 cf delete-org -f
 
 ginkgo -r -slowSpecThreshold=20 $DIR/acceptance
