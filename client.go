@@ -18,7 +18,7 @@ type Config struct {
 }
 
 type Client struct {
-	Config           Config
+	config           Config
 	Organizations    *OrganizationsService
 	Spaces           *SpacesService
 	Users            *UsersService
@@ -27,7 +27,7 @@ type Client struct {
 
 func NewClient(config Config) Client {
 	return Client{
-		Config:           config,
+		config:           config,
 		Organizations:    NewOrganizationsService(config),
 		Spaces:           NewSpacesService(config),
 		Users:            NewUsersService(config),
@@ -54,7 +54,7 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 		return 0, []byte{}, newRequestBodyMarshalError(err)
 	}
 
-	requestURL, err := url.Parse(client.Config.Host)
+	requestURL, err := url.Parse(client.config.Host)
 	if err != nil {
 		return 0, []byte{}, newRequestConfigurationError(err)
 	}
@@ -71,7 +71,7 @@ func (client Client) makeRequest(requestArgs requestArguments) (int, []byte, err
 
 	client.printRequest(request)
 
-	networkClient := network.GetClient(network.Config{SkipVerifySSL: client.Config.SkipVerifySSL})
+	networkClient := network.GetClient(network.Config{SkipVerifySSL: client.config.SkipVerifySSL})
 	response, err := networkClient.Do(request)
 	if err != nil {
 		return 0, []byte{}, newRequestHTTPError(err)

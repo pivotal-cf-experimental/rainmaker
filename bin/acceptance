@@ -1,11 +1,11 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
 DIR=`cd $(dirname $0)/.. && pwd`
-DOMAIN=acceptance.cfla.cf-app.com
-#DOMAIN=10.244.0.34.xip.io
+
+DOMAIN=$CF_DOMAIN
 
 uaac target uaa.$DOMAIN
-uaac token get admin admin
+uaac token get $CF_ADMIN_USERNAME $CF_ADMIN_PASSWORD
 
 export UAA_TOKEN=`uaac context | grep access_token | awk '{ print $2 }'`
 export CC_HOST=https://api.$DOMAIN
@@ -14,5 +14,6 @@ cf logout
 cf api $CC_HOST --skip-ssl-validation
 cf auth admin admin
 cf orgs | grep "^org-" | sort -r | xargs -n 1 cf delete-org -f
+cf orgs | grep "^warrant-org-" | sort -r | xargs -n 1 cf delete-org -f
 
 ginkgo -r -slowSpecThreshold=20 $DIR/acceptance

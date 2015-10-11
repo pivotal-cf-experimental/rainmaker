@@ -18,7 +18,7 @@ var _ = Describe("Fetch a space", func() {
 			SkipVerifySSL: true,
 		})
 
-		org, err := client.Organizations.Create(NewOrgName("org"), token)
+		org, err := client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		space, err := client.Spaces.Create("space-1", org.GUID, token)

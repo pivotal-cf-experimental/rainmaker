@@ -18,7 +18,7 @@ var _ = Describe("Fetch an organization", func() {
 			SkipVerifySSL: true,
 		})
 
-		org, err := client.Organizations.Create(NewOrgName("org"), token)
+		org, err := client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		fetchedOrg, err := client.Organizations.Get(org.GUID, token)

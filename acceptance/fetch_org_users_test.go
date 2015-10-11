@@ -21,7 +21,7 @@ var _ = Describe("Fetch all the users of an organization", func() {
 		user, err := client.Users.Create(NewGUID("user"), token)
 		Expect(err).NotTo(HaveOccurred())
 
-		org, err := client.Organizations.Create(NewOrgName("org"), token)
+		org, err := client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		err = org.Users.Associate(user.GUID, token)
@@ -42,7 +42,7 @@ var _ = Describe("Fetch all the users of an organization", func() {
 			SkipVerifySSL: true,
 		})
 
-		org, err := client.Organizations.Create(NewOrgName("org"), token)
+		org, err := client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		for i := 0; i < 150; i++ {

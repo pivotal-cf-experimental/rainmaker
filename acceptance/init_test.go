@@ -2,7 +2,6 @@ package acceptance
 
 import (
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/nu7hatch/gouuid"
@@ -11,11 +10,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var index int
-
 func TestAcceptanceSuite(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Acceptance Suite")
+	RunSpecs(t, "acceptance")
 }
 
 func NewGUID(prefix string) string {
@@ -25,18 +22,8 @@ func NewGUID(prefix string) string {
 	}
 
 	if prefix != "" {
-		return fmt.Sprintf("%s-%s", prefix, guid.String())
+		return fmt.Sprintf("warrant-%s-%s", prefix, guid.String())
 	}
 
 	return guid.String()
-}
-
-func NewOrgName(prefix string) string {
-	index++
-
-	if prefix != "" {
-		return fmt.Sprintf("%s-%d", prefix, index)
-	}
-
-	return strconv.Itoa(index)
 }

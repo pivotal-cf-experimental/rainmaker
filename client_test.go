@@ -16,7 +16,9 @@ var _ = Describe("Client", func() {
 	var client rainmaker.Client
 
 	BeforeEach(func() {
-		client = rainmaker.NewClient(rainmaker.Config{Host: "http://example.com"})
+		client = rainmaker.NewClient(rainmaker.Config{
+			Host: "http://example.com",
+		})
 	})
 
 	It("has an organizations service", func() {
@@ -44,7 +46,10 @@ var _ = Describe("Client", func() {
 			})
 
 			It("returns a RequestConfigurationError when the request params are bad", func() {
-				client.Config.Host = "://example.com"
+				client = rainmaker.NewClient(rainmaker.Config{
+					Host: "://example.com",
+				})
+
 				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)
 				Expect(err).To(HaveOccurred())
@@ -52,7 +57,10 @@ var _ = Describe("Client", func() {
 			})
 
 			It("returns a RequestHTTPError when the request fails", func() {
-				client.Config.Host = "banana://example.com"
+				client = rainmaker.NewClient(rainmaker.Config{
+					Host: "banana://example.com",
+				})
+
 				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)
 				Expect(err).To(HaveOccurred())
@@ -64,7 +72,9 @@ var _ = Describe("Client", func() {
 					w.Header().Set("Content-Length", "100")
 					w.Write([]byte("{}"))
 				}))
-				client.Config.Host = fakeServer.URL
+				client = rainmaker.NewClient(rainmaker.Config{
+					Host: fakeServer.URL,
+				})
 
 				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)
@@ -79,7 +89,9 @@ var _ = Describe("Client", func() {
 					w.WriteHeader(http.StatusTeapot)
 					w.Write([]byte(`I'm a little teapot`))
 				}))
-				client.Config.Host = fakeServer.URL
+				client = rainmaker.NewClient(rainmaker.Config{
+					Host: fakeServer.URL,
+				})
 
 				requestArgs := rainmaker.NewRequestArguments("GET", "/path", "token", nil, []int{http.StatusOK})
 				_, _, err := client.MakeRequest(requestArgs)

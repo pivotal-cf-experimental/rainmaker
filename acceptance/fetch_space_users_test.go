@@ -21,7 +21,7 @@ var _ = Describe("Fetch all the users of a space", func() {
 		user, err := client.Users.Create(NewGUID("user"), token)
 		Expect(err).NotTo(HaveOccurred())
 
-		org, err := client.Organizations.Create(NewOrgName("org"), token)
+		org, err := client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		err = org.Users.Associate(user.GUID, token)
@@ -48,7 +48,7 @@ var _ = Describe("Fetch all the users of a space", func() {
 			SkipVerifySSL: true,
 		})
 
-		org, err := client.Organizations.Create(NewOrgName("org"), token)
+		org, err := client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		space, err := client.Spaces.Create("my-space", org.GUID, token)
