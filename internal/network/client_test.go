@@ -80,45 +80,19 @@ var _ = Describe("Client", func() {
 		})
 
 		It("can make more requests than the total allowed number of open files", func() {
-			var output []byte
+			cmd := exec.Command("ulimit", "-n")
+			output, err := cmd.Output()
+			Expect(err).NotTo(HaveOccurred())
 
-			_, err := exec.LookPath("ulimit")
-			if err != nil {
-				var err error
-				output, err = ioutil.ReadFile("/proc/sys/fs/nr_open")
-				Expect(err).NotTo(HaveOccurred())
-			} else {
-				cmd := exec.Command("ulimit", "-n")
-
-				var err error
-				output, err = cmd.Output()
-				Expect(err).NotTo(HaveOccurred())
-			}
 			fdCount, err := strconv.ParseInt(strings.TrimSpace(string(output)), 10, 64)
 			Expect(err).NotTo(HaveOccurred())
 
-			requests := make(chan struct{}, int(fdCount)+10)
 			for i := 0; i < int(fdCount)+10; i++ {
-				requests <- struct{}{}
-			}
-
-			errors := make(chan error)
-			for i := 0; i < 25; i++ {
-				go func() {
-					for {
-						<-requests
-						_, err := client.MakeRequest(network.Request{
-							Method: "GET",
-							Path:   "/path",
-							AcceptableStatusCodes: []int{http.StatusOK},
-						})
-						errors <- err
-					}
-				}()
-			}
-
-			for i := 0; i < int(fdCount)+10; i++ {
-				err := <-errors
+				_, err := client.MakeRequest(network.Request{
+					Method: "GET",
+					Path:   "/path",
+					AcceptableStatusCodes: []int{http.StatusOK},
+				})
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
