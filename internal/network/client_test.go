@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -80,12 +81,31 @@ var _ = Describe("Client", func() {
 		})
 
 		It("can make more requests than the total allowed number of open files", func() {
-			cmd := exec.Command("ulimit", "-n")
-			output, err := cmd.Output()
-			Expect(err).NotTo(HaveOccurred())
+			var fdCount int64
 
-			fdCount, err := strconv.ParseInt(strings.TrimSpace(string(output)), 10, 64)
-			Expect(err).NotTo(HaveOccurred())
+			_, err := exec.LookPath("ulimit")
+			if err != nil {
+				output, err := ioutil.ReadFile("/proc/sys/net/ipv4/ip_local_port_range")
+				Expect(err).NotTo(HaveOccurred())
+
+				parts := regexp.MustCompile(`[[:space:]]`).Split(string(output), -1)
+
+				min, err := strconv.ParseInt(parts[0], 10, 64)
+				Expect(err).NotTo(HaveOccurred())
+
+				max, err := strconv.ParseInt(parts[1], 10, 64)
+				Expect(err).NotTo(HaveOccurred())
+
+				fdCount = max - min
+			} else {
+				cmd := exec.Command("ulimit", "-n")
+
+				output, err := cmd.Output()
+				Expect(err).NotTo(HaveOccurred())
+
+				fdCount, err = strconv.ParseInt(strings.TrimSpace(string(output)), 10, 64)
+				Expect(err).NotTo(HaveOccurred())
+			}
 
 			for i := 0; i < int(fdCount)+10; i++ {
 				_, err := client.MakeRequest(network.Request{
