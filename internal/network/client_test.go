@@ -97,12 +97,28 @@ var _ = Describe("Client", func() {
 			fdCount, err := strconv.ParseInt(strings.TrimSpace(string(output)), 10, 64)
 			Expect(err).NotTo(HaveOccurred())
 
+			requests := make(chan struct{}, int(fdCount)+10)
 			for i := 0; i < int(fdCount)+10; i++ {
-				_, err := client.MakeRequest(network.Request{
-					Method: "GET",
-					Path:   "/path",
-					AcceptableStatusCodes: []int{http.StatusOK},
-				})
+				requests <- struct{}{}
+			}
+
+			errors := make(chan error)
+			for i := 0; i < 50; i++ {
+				go func() {
+					for {
+						<-requests
+						_, err := client.MakeRequest(network.Request{
+							Method: "GET",
+							Path:   "/path",
+							AcceptableStatusCodes: []int{http.StatusOK},
+						})
+						errors <- err
+					}
+				}()
+			}
+
+			for i := 0; i < int(fdCount)+10; i++ {
+				err := <-errors
 				Expect(err).NotTo(HaveOccurred())
 			}
 		})
