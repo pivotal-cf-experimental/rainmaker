@@ -26,7 +26,11 @@ var _ = Describe("Fetch a space", func() {
 		var err error
 		org, err = client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
+	})
 
+	AfterEach(func() {
+		err := client.Organizations.Delete(org.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("fetches the space", func() {
@@ -39,5 +43,8 @@ var _ = Describe("Fetch a space", func() {
 
 		err = client.Spaces.Delete(space.GUID, token)
 		Expect(err).NotTo(HaveOccurred())
+
+		_, err = client.Spaces.Get(space.GUID, token)
+		Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
 	})
 })

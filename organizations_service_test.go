@@ -52,6 +52,16 @@ var _ = Describe("OrganizationsService", func() {
 		})
 	})
 
+	Describe("Delete", func() {
+		It("deletes the organization", func() {
+			err := service.Delete(organization.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			_, err = service.Get(organization.GUID, token)
+			Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+		})
+	})
+
 	Context("when listing related users", func() {
 		var user1, user2, user3 rainmaker.User
 

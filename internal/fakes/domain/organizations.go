@@ -10,15 +10,19 @@ func NewOrganizations() *Organizations {
 	}
 }
 
-func (orgs Organizations) Get(guid string) (Organization, bool) {
-	org, ok := orgs.store[guid]
+func (o Organizations) Get(guid string) (Organization, bool) {
+	org, ok := o.store[guid]
 	return org, ok
 }
 
-func (orgs Organizations) Add(org Organization) {
-	orgs.store[org.GUID] = org
+func (o Organizations) Add(org Organization) {
+	o.store[org.GUID] = org
 }
 
-func (orgs *Organizations) Clear() {
-	orgs.store = make(map[string]Organization)
+func (o Organizations) Delete(guid string) {
+	delete(o.store, guid)
+}
+
+func (o *Organizations) Clear() {
+	o.store = make(map[string]Organization)
 }

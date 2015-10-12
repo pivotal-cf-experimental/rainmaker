@@ -28,6 +28,11 @@ var _ = Describe("Fetch all the billing managers of an organization", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
+	AfterEach(func() {
+		err := client.Organizations.Delete(org.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
 	It("fetches the user records of all billing managers associated with an organization", func() {
 		user, err := client.Users.Create(NewGUID("user"), token)
 		Expect(err).NotTo(HaveOccurred())

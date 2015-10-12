@@ -2,6 +2,7 @@ package rainmaker
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -45,12 +46,12 @@ func (service OrganizationsService) Create(name string, token string) (Organizat
 func (service OrganizationsService) Get(guid, token string) (Organization, error) {
 	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method:                "GET",
-		Path:                  "/v2/organizations/" + guid,
+		Path:                  fmt.Sprintf("/v2/organizations/%s", guid),
 		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
-		return Organization{}, err
+		return Organization{}, translateError(err)
 	}
 
 	var response documents.OrganizationResponse
@@ -60,6 +61,20 @@ func (service OrganizationsService) Get(guid, token string) (Organization, error
 	}
 
 	return newOrganizationFromResponse(service.config, response), nil
+}
+
+func (service OrganizationsService) Delete(guid, token string) error {
+	_, err := newNetworkClient(service.config).MakeRequest(network.Request{
+		Method:                "DELETE",
+		Path:                  fmt.Sprintf("/v2/organizations/%s", guid),
+		Authorization:         network.NewTokenAuthorization(token),
+		AcceptableStatusCodes: []int{http.StatusNoContent},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
 }
 
 func (service OrganizationsService) ListUsers(guid, token string) (UsersList, error) {

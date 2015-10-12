@@ -35,6 +35,9 @@ var _ = Describe("Fetch all the users of a space", func() {
 	AfterEach(func() {
 		err := client.Spaces.Delete(space.GUID, token)
 		Expect(err).NotTo(HaveOccurred())
+
+		err = client.Organizations.Delete(org.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("fetches the user records of all users associated with a space", func() {

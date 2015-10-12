@@ -30,5 +30,11 @@ var _ = Describe("Fetch an organization", func() {
 		fetchedOrg, err := client.Organizations.Get(org.GUID, token)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(fetchedOrg).To(Equal(org))
+
+		err = client.Organizations.Delete(org.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
+
+		_, err = client.Organizations.Get(org.GUID, token)
+		Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
 	})
 })

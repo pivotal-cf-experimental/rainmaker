@@ -26,7 +26,11 @@ var _ = Describe("Fetch all the users of an organization", func() {
 		var err error
 		org, err = client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
+	})
 
+	AfterEach(func() {
+		err := client.Organizations.Delete(org.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	It("fetches the user records of all users associated with an organization", func() {
