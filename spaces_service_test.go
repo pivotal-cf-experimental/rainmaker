@@ -10,7 +10,7 @@ import (
 var _ = Describe("SpacesService", func() {
 	var (
 		config    rainmaker.Config
-		service   *rainmaker.SpacesService
+		service   rainmaker.SpacesService
 		token     string
 		spaceName string
 		org       rainmaker.Organization

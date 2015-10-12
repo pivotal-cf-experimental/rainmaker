@@ -8,8 +8,10 @@ import (
 )
 
 var _ = Describe("UsersService", func() {
-	var token string
-	var service *rainmaker.UsersService
+	var (
+		token   string
+		service rainmaker.UsersService
+	)
 
 	BeforeEach(func() {
 		token = "token"

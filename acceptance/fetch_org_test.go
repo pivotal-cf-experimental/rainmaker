@@ -10,14 +10,20 @@ import (
 )
 
 var _ = Describe("Fetch an organization", func() {
-	It("fetches the organization", func() {
-		token := os.Getenv("UAA_TOKEN")
+	var (
+		token  string
+		client rainmaker.Client
+	)
 
-		client := rainmaker.NewClient(rainmaker.Config{
+	BeforeEach(func() {
+		token = os.Getenv("UAA_TOKEN")
+		client = rainmaker.NewClient(rainmaker.Config{
 			Host:          os.Getenv("CC_HOST"),
 			SkipVerifySSL: true,
 		})
+	})
 
+	It("fetches the organization", func() {
 		org, err := client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 

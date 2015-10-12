@@ -14,10 +14,10 @@ type Config struct {
 
 type Client struct {
 	config           Config
-	Organizations    *OrganizationsService
-	Spaces           *SpacesService
-	Users            *UsersService
-	ServiceInstances *ServiceInstancesService
+	Organizations    OrganizationsService
+	Spaces           SpacesService
+	Users            UsersService
+	ServiceInstances ServiceInstancesService
 }
 
 func NewClient(config Config) Client {

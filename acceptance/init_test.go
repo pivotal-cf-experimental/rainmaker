@@ -27,3 +27,26 @@ func NewGUID(prefix string) string {
 
 	return guid.String()
 }
+
+type WorkPool struct {
+	Results <-chan result
+}
+
+type result struct {
+	Error error
+}
+
+func NewWorkPool(count int, fn func() error) WorkPool {
+	results := make(chan result)
+
+	for i := 0; i < count; i++ {
+		go func() {
+			for {
+				err := fn()
+				results <- result{err}
+			}
+		}()
+	}
+
+	return WorkPool{results}
+}

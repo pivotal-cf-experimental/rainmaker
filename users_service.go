@@ -13,8 +13,8 @@ type UsersService struct {
 	user   User
 }
 
-func NewUsersService(config Config) *UsersService {
-	return &UsersService{
+func NewUsersService(config Config) UsersService {
+	return UsersService{
 		config: config,
 	}
 }

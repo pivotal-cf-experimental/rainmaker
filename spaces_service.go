@@ -14,8 +14,8 @@ type SpacesService struct {
 	config Config
 }
 
-func NewSpacesService(config Config) *SpacesService {
-	return &SpacesService{
+func NewSpacesService(config Config) SpacesService {
+	return SpacesService{
 		config: config,
 	}
 }

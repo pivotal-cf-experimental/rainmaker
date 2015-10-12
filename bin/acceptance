@@ -12,4 +12,9 @@ cf orgs | grep "^rainmaker-org-" | sort -r | xargs -n 1 cf delete-org -f
 
 export UAA_TOKEN=`cf oauth-token | grep bearer | cut -f2 -d' '`
 
-ginkgo -r -slowSpecThreshold=20 $DIR/acceptance
+ginkgo \
+	-r \
+	-p=true \
+	-succinct=true \
+	-slowSpecThreshold=20 \
+	$DIR/acceptance

@@ -10,18 +10,27 @@ import (
 )
 
 var _ = Describe("Fetch all the users of an organization", func() {
-	It("fetches the user records of all users associated with an organization", func() {
-		token := os.Getenv("UAA_TOKEN")
+	var (
+		token  string
+		client rainmaker.Client
+		org    rainmaker.Organization
+	)
 
-		client := rainmaker.NewClient(rainmaker.Config{
+	BeforeEach(func() {
+		token = os.Getenv("UAA_TOKEN")
+		client = rainmaker.NewClient(rainmaker.Config{
 			Host:          os.Getenv("CC_HOST"),
 			SkipVerifySSL: true,
 		})
 
-		user, err := client.Users.Create(NewGUID("user"), token)
+		var err error
+		org, err = client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
-		org, err := client.Organizations.Create(NewGUID("org"), token)
+	})
+
+	It("fetches the user records of all users associated with an organization", func() {
+		user, err := client.Users.Create(NewGUID("user"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		err = org.Users.Associate(user.GUID, token)
@@ -35,22 +44,30 @@ var _ = Describe("Fetch all the users of an organization", func() {
 	})
 
 	It("fetches paginated results of users associated with an organization", func() {
-		token := os.Getenv("UAA_TOKEN")
-
-		client := rainmaker.NewClient(rainmaker.Config{
-			Host:          os.Getenv("CC_HOST"),
-			SkipVerifySSL: true,
-		})
-
-		org, err := client.Organizations.Create(NewGUID("org"), token)
-		Expect(err).NotTo(HaveOccurred())
-
+		usernames := make(chan string, 150)
 		for i := 0; i < 150; i++ {
-			user, err := client.Users.Create(NewGUID("user"), token)
-			Expect(err).NotTo(HaveOccurred())
+			usernames <- NewGUID("user")
+		}
+
+		pool := NewWorkPool(10, func() error {
+			name := <-usernames
+
+			user, err := client.Users.Create(name, token)
+			if err != nil {
+				return err
+			}
 
 			err = org.Users.Associate(user.GUID, token)
-			Expect(err).NotTo(HaveOccurred())
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		for i := 0; i < 150; i++ {
+			r := <-pool.Results
+			Expect(r.Error).NotTo(HaveOccurred())
 		}
 
 		list, err := client.Organizations.ListUsers(org.GUID, token)

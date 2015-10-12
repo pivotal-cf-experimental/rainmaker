@@ -10,18 +10,28 @@ import (
 )
 
 var _ = Describe("Fetch a space", func() {
-	It("fetches the space", func() {
-		token := os.Getenv("UAA_TOKEN")
+	var (
+		token  string
+		client rainmaker.Client
+		org    rainmaker.Organization
+	)
 
-		client := rainmaker.NewClient(rainmaker.Config{
+	BeforeEach(func() {
+		token = os.Getenv("UAA_TOKEN")
+		client = rainmaker.NewClient(rainmaker.Config{
 			Host:          os.Getenv("CC_HOST"),
 			SkipVerifySSL: true,
 		})
 
-		org, err := client.Organizations.Create(NewGUID("org"), token)
+		var err error
+		org, err = client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
 
-		space, err := client.Spaces.Create("space-1", org.GUID, token)
+	})
+
+	It("fetches the space", func() {
+		space, err := client.Spaces.Create(NewGUID("space"), org.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
 
 		fetchedSpace, err := client.Spaces.Get(space.GUID, token)
 		Expect(err).NotTo(HaveOccurred())

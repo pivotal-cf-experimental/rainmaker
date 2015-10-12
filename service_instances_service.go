@@ -13,8 +13,8 @@ type ServiceInstancesService struct {
 	config Config
 }
 
-func NewServiceInstancesService(config Config) *ServiceInstancesService {
-	return &ServiceInstancesService{
+func NewServiceInstancesService(config Config) ServiceInstancesService {
+	return ServiceInstancesService{
 		config: config,
 	}
 }

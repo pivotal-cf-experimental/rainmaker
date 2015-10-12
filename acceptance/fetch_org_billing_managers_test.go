@@ -10,18 +10,26 @@ import (
 )
 
 var _ = Describe("Fetch all the billing managers of an organization", func() {
-	It("fetches the user records of all billing managers associated with an organization", func() {
-		token := os.Getenv("UAA_TOKEN")
+	var (
+		token  string
+		client rainmaker.Client
+		org    rainmaker.Organization
+	)
 
-		client := rainmaker.NewClient(rainmaker.Config{
+	BeforeEach(func() {
+		token = os.Getenv("UAA_TOKEN")
+		client = rainmaker.NewClient(rainmaker.Config{
 			Host:          os.Getenv("CC_HOST"),
 			SkipVerifySSL: true,
 		})
 
-		user, err := client.Users.Create(NewGUID("user"), token)
+		var err error
+		org, err = client.Organizations.Create(NewGUID("org"), token)
 		Expect(err).NotTo(HaveOccurred())
+	})
 
-		org, err := client.Organizations.Create(NewGUID("org"), token)
+	It("fetches the user records of all billing managers associated with an organization", func() {
+		user, err := client.Users.Create(NewGUID("user"), token)
 		Expect(err).NotTo(HaveOccurred())
 
 		err = org.BillingManagers.Associate(user.GUID, token)

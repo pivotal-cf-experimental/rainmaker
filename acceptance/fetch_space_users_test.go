@@ -10,24 +10,38 @@ import (
 )
 
 var _ = Describe("Fetch all the users of a space", func() {
-	It("fetches the user records of all users associated with a space", func() {
-		token := os.Getenv("UAA_TOKEN")
+	var (
+		token  string
+		client rainmaker.Client
+		org    rainmaker.Organization
+		space  rainmaker.Space
+	)
 
-		client := rainmaker.NewClient(rainmaker.Config{
+	BeforeEach(func() {
+		token = os.Getenv("UAA_TOKEN")
+		client = rainmaker.NewClient(rainmaker.Config{
 			Host:          os.Getenv("CC_HOST"),
 			SkipVerifySSL: true,
 		})
 
+		var err error
+		org, err = client.Organizations.Create(NewGUID("org"), token)
+		Expect(err).NotTo(HaveOccurred())
+
+		space, err = client.Spaces.Create(NewGUID("space"), org.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	AfterEach(func() {
+		err := client.Spaces.Delete(space.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
+	})
+
+	It("fetches the user records of all users associated with a space", func() {
 		user, err := client.Users.Create(NewGUID("user"), token)
 		Expect(err).NotTo(HaveOccurred())
 
-		org, err := client.Organizations.Create(NewGUID("org"), token)
-		Expect(err).NotTo(HaveOccurred())
-
 		err = org.Users.Associate(user.GUID, token)
-		Expect(err).NotTo(HaveOccurred())
-
-		space, err := client.Spaces.Create("my-space", org.GUID, token)
 		Expect(err).NotTo(HaveOccurred())
 
 		err = space.Developers.Associate(user.GUID, token)
@@ -41,28 +55,35 @@ var _ = Describe("Fetch all the users of a space", func() {
 	})
 
 	It("fetches paginated results of users associated with a space", func() {
-		token := os.Getenv("UAA_TOKEN")
-
-		client := rainmaker.NewClient(rainmaker.Config{
-			Host:          os.Getenv("CC_HOST"),
-			SkipVerifySSL: true,
-		})
-
-		org, err := client.Organizations.Create(NewGUID("org"), token)
-		Expect(err).NotTo(HaveOccurred())
-
-		space, err := client.Spaces.Create("my-space", org.GUID, token)
-		Expect(err).NotTo(HaveOccurred())
-
+		usernames := make(chan string, 150)
 		for i := 0; i < 150; i++ {
-			user, err := client.Users.Create(NewGUID("user"), token)
-			Expect(err).NotTo(HaveOccurred())
+			usernames <- NewGUID("user")
+		}
+
+		pool := NewWorkPool(10, func() error {
+			name := <-usernames
+
+			user, err := client.Users.Create(name, token)
+			if err != nil {
+				return err
+			}
 
 			err = org.Users.Associate(user.GUID, token)
-			Expect(err).NotTo(HaveOccurred())
+			if err != nil {
+				return err
+			}
 
 			err = space.Developers.Associate(user.GUID, token)
-			Expect(err).NotTo(HaveOccurred())
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+
+		for i := 0; i < 150; i++ {
+			r := <-pool.Results
+			Expect(r.Error).NotTo(HaveOccurred())
 		}
 
 		list, err := client.Spaces.ListUsers(space.GUID, token)

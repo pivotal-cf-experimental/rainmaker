@@ -13,8 +13,8 @@ type OrganizationsService struct {
 	config Config
 }
 
-func NewOrganizationsService(config Config) *OrganizationsService {
-	return &OrganizationsService{
+func NewOrganizationsService(config Config) OrganizationsService {
+	return OrganizationsService{
 		config: config,
 	}
 }

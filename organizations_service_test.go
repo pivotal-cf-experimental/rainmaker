@@ -8,10 +8,12 @@ import (
 )
 
 var _ = Describe("OrganizationsService", func() {
-	var config rainmaker.Config
-	var token string
-	var service *rainmaker.OrganizationsService
-	var organization rainmaker.Organization
+	var (
+		config       rainmaker.Config
+		token        string
+		service      rainmaker.OrganizationsService
+		organization rainmaker.Organization
+	)
 
 	BeforeEach(func() {
 		var err error

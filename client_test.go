@@ -16,18 +16,19 @@ var _ = Describe("Client", func() {
 		})
 	})
 
-	It("has an organizations service", func() {
-		Expect(client.Organizations).To(BeAssignableToTypeOf(&rainmaker.OrganizationsService{}))
-		Expect(client.Organizations).NotTo(BeNil())
+	It("has a organizations service", func() {
+		Expect(client.Organizations).To(BeAssignableToTypeOf(rainmaker.OrganizationsService{}))
 	})
 
-	It("has an spaces service", func() {
-		Expect(client.Spaces).To(BeAssignableToTypeOf(&rainmaker.SpacesService{}))
-		Expect(client.Spaces).NotTo(BeNil())
+	It("has a spaces service", func() {
+		Expect(client.Spaces).To(BeAssignableToTypeOf(rainmaker.SpacesService{}))
+	})
+
+	It("has a users service", func() {
+		Expect(client.Users).To(BeAssignableToTypeOf(rainmaker.UsersService{}))
 	})
 
 	It("has a service instance service", func() {
-		Expect(client.ServiceInstances).To(BeAssignableToTypeOf(&rainmaker.ServiceInstancesService{}))
-		Expect(client.ServiceInstances).NotTo(BeNil())
+		Expect(client.ServiceInstances).To(BeAssignableToTypeOf(rainmaker.ServiceInstancesService{}))
 	})
 })

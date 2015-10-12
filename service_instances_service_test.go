@@ -8,9 +8,11 @@ import (
 )
 
 var _ = Describe("ServiceInstancesService", func() {
-	var config rainmaker.Config
-	var service *rainmaker.ServiceInstancesService
-	var token string
+	var (
+		config  rainmaker.Config
+		service rainmaker.ServiceInstancesService
+		token   string
+	)
 
 	BeforeEach(func() {
 		config = rainmaker.Config{
