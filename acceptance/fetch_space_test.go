@@ -26,5 +26,8 @@ var _ = Describe("Fetch a space", func() {
 		fetchedSpace, err := client.Spaces.Get(space.GUID, token)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(fetchedSpace).To(Equal(space))
+
+		err = client.Spaces.Delete(space.GUID, token)
+		Expect(err).NotTo(HaveOccurred())
 	})
 })

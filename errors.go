@@ -3,19 +3,19 @@ package rainmaker
 import "github.com/pivotal-cf-experimental/rainmaker/internal/network"
 
 type NotFoundError struct {
-	err error
+	Err error
 }
 
 func (e NotFoundError) Error() string {
-	return e.err.Error()
+	return e.Err.Error()
 }
 
 type Error struct {
-	err error
+	Err error
 }
 
 func (e Error) Error() string {
-	return e.err.Error()
+	return e.Err.Error()
 }
 
 func translateError(err error) error {

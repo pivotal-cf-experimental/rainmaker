@@ -47,12 +47,12 @@ func (service SpacesService) Create(name, orgGUID, token string) (Space, error) 
 func (service SpacesService) Get(guid, token string) (Space, error) {
 	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method:                "GET",
-		Path:                  "/v2/spaces/" + guid,
+		Path:                  fmt.Sprintf("/v2/spaces/%s", guid),
 		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
-		return Space{}, err
+		return Space{}, translateError(err)
 	}
 
 	var response documents.SpaceResponse
@@ -62,6 +62,20 @@ func (service SpacesService) Get(guid, token string) (Space, error) {
 	}
 
 	return newSpaceFromResponse(service.config, response), nil
+}
+
+func (service SpacesService) Delete(guid, token string) error {
+	_, err := newNetworkClient(service.config).MakeRequest(network.Request{
+		Method:                "DELETE",
+		Path:                  fmt.Sprintf("/v2/spaces/%s", guid),
+		Authorization:         network.NewTokenAuthorization(token),
+		AcceptableStatusCodes: []int{http.StatusNoContent},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return nil
 }
 
 func (service SpacesService) ListUsers(guid, token string) (UsersList, error) {

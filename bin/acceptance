@@ -5,9 +5,9 @@ DIR=`cd $(dirname $0)/.. && pwd`
 DOMAIN=$CF_DOMAIN
 export CC_HOST=https://api.$DOMAIN
 
-cf logout
-cf api $CC_HOST --skip-ssl-validation
-cf auth $CF_ADMIN_USERNAME $CF_ADMIN_PASSWORD
+cf logout > /dev/null
+cf api $CC_HOST --skip-ssl-validation > /dev/null
+cf auth $CF_ADMIN_USERNAME $CF_ADMIN_PASSWORD > /dev/null
 cf orgs | grep "^rainmaker-org-" | sort -r | xargs -n 1 cf delete-org -f
 
 export UAA_TOKEN=`cf oauth-token | grep bearer | cut -f2 -d' '`

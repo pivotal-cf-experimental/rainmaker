@@ -8,10 +8,13 @@ import (
 )
 
 var _ = Describe("SpacesService", func() {
-	var config rainmaker.Config
-	var service *rainmaker.SpacesService
-	var token, spaceName string
-	var org rainmaker.Organization
+	var (
+		config    rainmaker.Config
+		service   *rainmaker.SpacesService
+		token     string
+		spaceName string
+		org       rainmaker.Organization
+	)
 
 	BeforeEach(func() {
 		var err error
@@ -27,7 +30,7 @@ var _ = Describe("SpacesService", func() {
 	})
 
 	Describe("Create/Get", func() {
-		It("create a space and allows it to be fetched from the cloud controller", func() {
+		It("creates a space and allows it to be fetched from the cloud controller", func() {
 			space, err := service.Create(spaceName, org.GUID, token)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(space.Name).To(Equal(spaceName))
@@ -38,7 +41,7 @@ var _ = Describe("SpacesService", func() {
 			Expect(fetchedSpace.GUID).To(Equal(space.GUID))
 		})
 
-		Context("When the request errors", func() {
+		Context("when the request errors", func() {
 			BeforeEach(func() {
 				config.Host = ""
 				service = rainmaker.NewSpacesService(config)
@@ -51,9 +54,24 @@ var _ = Describe("SpacesService", func() {
 		})
 	})
 
+	Describe("Delete", func() {
+		It("deletes a space", func() {
+			space, err := service.Create(spaceName, org.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = service.Delete(space.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			_, err = service.Get(space.GUID, token)
+			Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+		})
+	})
+
 	Describe("ListUsers", func() {
-		var user rainmaker.User
-		var space rainmaker.Space
+		var (
+			user  rainmaker.User
+			space rainmaker.Space
+		)
 
 		BeforeEach(func() {
 			var err error
