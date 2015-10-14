@@ -77,6 +77,16 @@ func (service OrganizationsService) Delete(guid, token string) error {
 	return nil
 }
 
+func (service OrganizationsService) ListSpaces(guid, token string) (SpacesList, error) {
+	list := NewSpacesList(service.config, newRequestPlan("/v2/organizations/"+guid+"/spaces", url.Values{}))
+	err := list.Fetch(token)
+	if err != nil {
+		return SpacesList{}, translateError(err)
+	}
+
+	return list, nil
+}
+
 func (service OrganizationsService) ListUsers(guid, token string) (UsersList, error) {
 	list := NewUsersList(service.config, newRequestPlan("/v2/organizations/"+guid+"/users", url.Values{}))
 	err := list.Fetch(token)

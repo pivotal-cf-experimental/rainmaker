@@ -14,6 +14,8 @@ func NewRouter(orgs *domain.Organizations, users *domain.Users) http.Handler {
 	router.Handle("/v2/organizations/{guid}", getHandler{orgs}).Methods("GET")
 	router.Handle("/v2/organizations/{guid}", deleteHandler{orgs}).Methods("DELETE")
 
+	router.Handle("/v2/organizations/{guid}/spaces", getSpacesHandler{orgs}).Methods("GET")
+
 	router.Handle("/v2/organizations/{guid}/users", getUsersHandler{orgs}).Methods("GET")
 	router.Handle("/v2/organizations/{guid}/users/{user_guid}", associateUserHandler{orgs, users}).Methods("PUT")
 

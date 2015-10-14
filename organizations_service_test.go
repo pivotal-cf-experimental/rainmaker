@@ -62,6 +62,45 @@ var _ = Describe("OrganizationsService", func() {
 		})
 	})
 
+	Context("when listing related spaces", func() {
+		var space1, space2 rainmaker.Space
+
+		BeforeEach(func() {
+			var err error
+			spacesService := rainmaker.NewSpacesService(config)
+
+			space1, err = spacesService.Create("space-123", organization.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			space2, err = spacesService.Create("space-456", organization.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		Describe("ListSpaces", func() {
+			It("returns the spaces belonging to the organization", func() {
+				list, err := service.ListSpaces(organization.GUID, token)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(list.TotalResults).To(Equal(2))
+				Expect(list.TotalPages).To(Equal(1))
+				Expect(list.Spaces).To(HaveLen(2))
+
+				var spaceGUIDs []string
+				for _, space := range list.Spaces {
+					spaceGUIDs = append(spaceGUIDs, space.GUID)
+				}
+
+				Expect(spaceGUIDs).To(ConsistOf([]string{space1.GUID, space2.GUID}))
+			})
+
+			Context("when the organization does not exist", func() {
+				It("returns an error", func() {
+					_, err := service.ListSpaces("org-does-not-exist", token)
+					Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+				})
+			})
+		})
+	})
+
 	Context("when listing related users", func() {
 		var user1, user2, user3 rainmaker.User
 

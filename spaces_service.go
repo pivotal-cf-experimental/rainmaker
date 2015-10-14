@@ -44,6 +44,13 @@ func (service SpacesService) Create(name, orgGUID, token string) (Space, error) 
 	return newSpaceFromResponse(service.config, response), nil
 }
 
+func (service SpacesService) List(token string) (SpacesList, error) {
+	list := NewSpacesList(service.config, newRequestPlan("/v2/spaces", url.Values{}))
+	err := list.Fetch(token)
+
+	return list, err
+}
+
 func (service SpacesService) Get(guid, token string) (Space, error) {
 	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method:                "GET",

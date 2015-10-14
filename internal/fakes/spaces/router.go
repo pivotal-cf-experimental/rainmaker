@@ -7,10 +7,11 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 )
 
-func NewRouter(spaces *domain.Spaces, users *domain.Users) http.Handler {
+func NewRouter(orgs *domain.Organizations, spaces *domain.Spaces, users *domain.Users) http.Handler {
 	router := mux.NewRouter()
 
-	router.Handle("/v2/spaces", createHandler{spaces}).Methods("POST")
+	router.Handle("/v2/spaces", createHandler{orgs, spaces}).Methods("POST")
+	router.Handle("/v2/spaces", listHandler{spaces}).Methods("GET")
 	router.Handle("/v2/spaces/{guid}", getHandler{spaces}).Methods("GET")
 	router.Handle("/v2/spaces/{guid}", deleteHandler{spaces}).Methods("DELETE")
 

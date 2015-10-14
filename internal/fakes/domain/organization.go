@@ -13,6 +13,7 @@ type Organization struct {
 	QuotaDefinitionGUID string
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
+	Spaces              *Spaces
 	Users               *Users
 	BillingManagers     *Users
 	Auditors            *Users
@@ -22,6 +23,7 @@ type Organization struct {
 func NewOrganization(guid string) Organization {
 	return Organization{
 		GUID:            guid,
+		Spaces:          NewSpaces(),
 		Users:           NewUsers(),
 		BillingManagers: NewUsers(),
 		Auditors:        NewUsers(),

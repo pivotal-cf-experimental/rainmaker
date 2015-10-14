@@ -31,7 +31,7 @@ func NewCloudController() *CloudController {
 
 	router := mux.NewRouter()
 	router.Handle("/v2/organizations{anything:.*}", organizations.NewRouter(cc.Organizations, cc.Users))
-	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(cc.Spaces, cc.Users))
+	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(cc.Organizations, cc.Spaces, cc.Users))
 	router.Handle("/v2/users{anything:.*}", users.NewRouter(cc.Users, cc.Spaces))
 	router.Handle("/v2/service_instances{anything:.*}", serviceinstances.NewRouter(cc.ServiceInstances))
 

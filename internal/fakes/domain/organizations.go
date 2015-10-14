@@ -10,13 +10,13 @@ func NewOrganizations() *Organizations {
 	}
 }
 
+func (o Organizations) Add(org Organization) {
+	o.store[org.GUID] = org
+}
+
 func (o Organizations) Get(guid string) (Organization, bool) {
 	org, ok := o.store[guid]
 	return org, ok
-}
-
-func (o Organizations) Add(org Organization) {
-	o.store[org.GUID] = org
 }
 
 func (o Organizations) Delete(guid string) {

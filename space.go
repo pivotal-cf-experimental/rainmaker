@@ -14,7 +14,7 @@ type Space struct {
 	CreatedAt                time.Time
 	UpdatedAt                time.Time
 	Name                     string
-	OrganizationGUID         string
+	OrganizationGUID         string `json:"organization_guid"`
 	SpaceQuotaDefinitionGUID string
 	OrganizationURL          string
 	DevelopersURL            string
