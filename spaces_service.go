@@ -65,7 +65,7 @@ func (service SpacesService) Get(guid, token string) (Space, error) {
 	var response documents.SpaceResponse
 	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
-		panic(err)
+		return Space{}, translateError(err)
 	}
 
 	return newSpaceFromResponse(service.config, response), nil
@@ -79,7 +79,7 @@ func (service SpacesService) Delete(guid, token string) error {
 		AcceptableStatusCodes: []int{http.StatusNoContent},
 	})
 	if err != nil {
-		panic(err)
+		return translateError(err)
 	}
 
 	return nil

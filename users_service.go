@@ -56,7 +56,7 @@ func (service UsersService) Get(guid, token string) (User, error) {
 	var response documents.UserResponse
 	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
-		panic(err)
+		return User{}, translateError(err)
 	}
 
 	return newUserFromResponse(service.config, response), nil

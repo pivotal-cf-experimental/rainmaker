@@ -56,6 +56,13 @@ var _ = Describe("SpacesService", func() {
 				Expect(err).To(HaveOccurred())
 			})
 		})
+
+		Context("when unmarshalling fails", func() {
+			It("returns an error", func() {
+				_, err := service.Get("very-bad-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
+		})
 	})
 
 	Describe("List", func() {
@@ -99,6 +106,13 @@ var _ = Describe("SpacesService", func() {
 
 			_, err = service.Get(space.GUID, token)
 			Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+		})
+
+		Context("when the response status is unexpected", func() {
+			It("returns an error", func() {
+				err := service.Delete("very-bad-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
 		})
 	})
 

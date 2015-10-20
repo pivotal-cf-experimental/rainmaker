@@ -43,5 +43,12 @@ var _ = Describe("UsersService", func() {
 				Expect(err).To(HaveOccurred())
 			})
 		})
+
+		Context("when the unmarshal fails", func() {
+			It("returns the error", func() {
+				_, err := service.Get("very-bad-user-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
+		})
 	})
 })

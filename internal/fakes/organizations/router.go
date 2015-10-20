@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/invalid"
 )
 
 func NewRouter(orgs *domain.Organizations, users *domain.Users) http.Handler {
@@ -12,7 +13,9 @@ func NewRouter(orgs *domain.Organizations, users *domain.Users) http.Handler {
 
 	router.Handle("/v2/organizations", createHandler{orgs}).Methods("POST")
 	router.Handle("/v2/organizations", listHandler{orgs}).Methods("GET")
+	router.Handle("/v2/organizations/very-bad-guid", invalid.Handler{}).Methods("GET")
 	router.Handle("/v2/organizations/{guid}", getHandler{orgs}).Methods("GET")
+	router.Handle("/v2/organizations/very-bad-guid", invalid.Handler{}).Methods("DELETE")
 	router.Handle("/v2/organizations/{guid}", deleteHandler{orgs}).Methods("DELETE")
 
 	router.Handle("/v2/organizations/{guid}/spaces", getSpacesHandler{orgs}).Methods("GET")

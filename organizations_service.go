@@ -64,7 +64,7 @@ func (service OrganizationsService) Get(guid, token string) (Organization, error
 	var response documents.OrganizationResponse
 	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
-		panic(err)
+		return Organization{}, translateError(err)
 	}
 
 	return newOrganizationFromResponse(service.config, response), nil
@@ -78,7 +78,7 @@ func (service OrganizationsService) Delete(guid, token string) error {
 		AcceptableStatusCodes: []int{http.StatusNoContent},
 	})
 	if err != nil {
-		panic(err)
+		return translateError(err)
 	}
 
 	return nil

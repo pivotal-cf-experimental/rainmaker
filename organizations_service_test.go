@@ -77,6 +77,25 @@ var _ = Describe("OrganizationsService", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(organization.GUID).To(Equal(orgGUID))
 		})
+
+		Context("when the request errors", func() {
+			BeforeEach(func() {
+				config.Host = ""
+				service = rainmaker.NewOrganizationsService(config)
+			})
+
+			It("returns the error", func() {
+				_, err := service.Create("org-name", token)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
+		Context("when unmarshalling fails", func() {
+			It("returns an error", func() {
+				_, err := service.Get("very-bad-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
+		})
 	})
 
 	Describe("Delete", func() {
@@ -86,6 +105,13 @@ var _ = Describe("OrganizationsService", func() {
 
 			_, err = service.Get(organization.GUID, token)
 			Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+		})
+
+		Context("when the response status is unexpected", func() {
+			It("returns an error", func() {
+				err := service.Delete("very-bad-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
 		})
 	})
 
