@@ -1,4 +1,4 @@
-package fakes
+package testserver
 
 import (
 	"net/http"

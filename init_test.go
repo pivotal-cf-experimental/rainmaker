@@ -3,13 +3,13 @@ package rainmaker_test
 import (
 	"testing"
 
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes"
+	"github.com/pivotal-cf-experimental/rainmaker/testserver"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var fakeCloudController *fakes.CloudController
+var fakeCloudController *testserver.CloudController
 
 func TestRainmakerSuite(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -17,7 +17,7 @@ func TestRainmakerSuite(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	fakeCloudController = fakes.NewCloudController()
+	fakeCloudController = testserver.NewCloudController()
 	fakeCloudController.Start()
 })
 
