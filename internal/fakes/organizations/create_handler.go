@@ -22,6 +22,11 @@ func (h createHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	organization := domain.NewOrganization(domain.NewGUID("org"))
+
+	if document.GUID != "" {
+		organization.GUID = document.GUID
+	}
+
 	organization.Name = document.Name
 	organization.CreatedAt = now
 	organization.UpdatedAt = now

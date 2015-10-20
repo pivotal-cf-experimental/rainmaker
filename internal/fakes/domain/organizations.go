@@ -1,5 +1,7 @@
 package domain
 
+import "sort"
+
 type Organizations struct {
 	store map[string]Organization
 }
@@ -10,8 +12,10 @@ func NewOrganizations() *Organizations {
 	}
 }
 
-func (o Organizations) Add(org Organization) {
-	o.store[org.GUID] = org
+func (o Organizations) Add(orgsToAdd ...Organization) {
+	for _, org := range orgsToAdd {
+		o.store[org.GUID] = org
+	}
 }
 
 func (o Organizations) Get(guid string) (Organization, bool) {
@@ -25,4 +29,24 @@ func (o Organizations) Delete(guid string) {
 
 func (o *Organizations) Clear() {
 	o.store = make(map[string]Organization)
+}
+
+func (o Organizations) Len() int {
+	return len(o.store)
+}
+
+func (o Organizations) Items() []interface{} {
+	guids := sort.StringSlice([]string{})
+	for _, org := range o.store {
+		guids = append(guids, org.GUID)
+	}
+
+	sort.Sort(guids)
+
+	var items []interface{}
+	for _, guid := range guids {
+		items = append(items, o.store[guid])
+	}
+
+	return items
 }

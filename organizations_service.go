@@ -43,6 +43,13 @@ func (service OrganizationsService) Create(name string, token string) (Organizat
 	return newOrganizationFromResponse(service.config, response), nil
 }
 
+func (service OrganizationsService) List(token string) (OrganizationsList, error) {
+	list := NewOrganizationsList(service.config, newRequestPlan("/v2/organizations", url.Values{}))
+	err := list.Fetch(token)
+
+	return list, err
+}
+
 func (service OrganizationsService) Get(guid, token string) (Organization, error) {
 	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method:                "GET",

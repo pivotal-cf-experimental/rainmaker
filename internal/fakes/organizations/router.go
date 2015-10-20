@@ -11,6 +11,7 @@ func NewRouter(orgs *domain.Organizations, users *domain.Users) http.Handler {
 	router := mux.NewRouter()
 
 	router.Handle("/v2/organizations", createHandler{orgs}).Methods("POST")
+	router.Handle("/v2/organizations", listHandler{orgs}).Methods("GET")
 	router.Handle("/v2/organizations/{guid}", getHandler{orgs}).Methods("GET")
 	router.Handle("/v2/organizations/{guid}", deleteHandler{orgs}).Methods("DELETE")
 

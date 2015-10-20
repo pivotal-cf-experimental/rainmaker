@@ -41,6 +41,33 @@ var _ = Describe("OrganizationsService", func() {
 		})
 	})
 
+	Describe("List", func() {
+		var (
+			org1 rainmaker.Organization
+		)
+
+		BeforeEach(func() {
+			var err error
+
+			org1, err = service.Create("first org", token)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("retrieves a list of all orgs from the cloud controller", func() {
+			list, err := service.List(token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(list.TotalResults).To(Equal(2))
+			Expect(list.TotalPages).To(Equal(1))
+			Expect(list.Organizations).To(HaveLen(2))
+
+			orgGuids := []string{
+				list.Organizations[0].GUID,
+				list.Organizations[1].GUID,
+			}
+			Expect(orgGuids).To(ConsistOf([]string{org1.GUID, organization.GUID}))
+		})
+	})
+
 	Describe("Get", func() {
 		It("returns the organization matching the given GUID", func() {
 			var err error
