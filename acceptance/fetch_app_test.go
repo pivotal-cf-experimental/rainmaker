@@ -52,7 +52,6 @@ var _ = Describe("Application", func() {
 			app, err = client.Applications.Create(rainmaker.Application{
 				Name:      "some-test-app",
 				SpaceGUID: space.GUID,
-				Diego:     true,
 			}, token)
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -63,7 +62,6 @@ var _ = Describe("Application", func() {
 			Expect(fetchedApp.GUID).To(Equal(app.GUID))
 			Expect(fetchedApp.Name).To(Equal(app.Name))
 			Expect(fetchedApp.SpaceGUID).To(Equal(app.SpaceGUID))
-			Expect(fetchedApp.Diego).To(BeTrue())
 		})
 
 		By("deleting the app", func() {
