@@ -18,6 +18,6 @@ func NewSpaceFromResponse(config Config, document documents.SpaceResponse) Space
 	return newSpaceFromResponse(config, document)
 }
 
-func NewApplicationFromCreateResponse(config Config, document documents.ApplicationCreateResponse) Application {
-	return newApplicationFromCreateResponse(config, document)
+func NewApplicationFromResponse(config Config, document documents.ApplicationResponse) Application {
+	return newApplicationFromResponse(config, document)
 }

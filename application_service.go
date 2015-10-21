@@ -35,13 +35,13 @@ func (service ApplicationsService) Create(application Application, token string)
 		return Application{}, translateError(err)
 	}
 
-	var response documents.ApplicationCreateResponse
+	var response documents.ApplicationResponse
 	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
 		panic(err)
 	}
 
-	return newApplicationFromCreateResponse(service.config, response), nil
+	return newApplicationFromResponse(service.config, response), nil
 }
 
 func (service ApplicationsService) Get(guid, token string) (Application, error) {
@@ -55,33 +55,13 @@ func (service ApplicationsService) Get(guid, token string) (Application, error) 
 		return Application{}, translateError(err)
 	}
 
-	var response documents.ApplicationCreateResponse
+	var response documents.ApplicationResponse
 	err = json.Unmarshal(resp.Body, &response)
 	if err != nil {
 		return Application{}, translateError(err)
 	}
 
-	return newApplicationFromCreateResponse(service.config, response), nil
-}
-
-func (service ApplicationsService) Summary(guid, token string) (Application, error) {
-	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
-		Method:                "GET",
-		Path:                  fmt.Sprintf("/v2/apps/%s/summary", guid),
-		Authorization:         network.NewTokenAuthorization(token),
-		AcceptableStatusCodes: []int{http.StatusOK},
-	})
-	if err != nil {
-		return Application{}, translateError(err)
-	}
-
-	var response documents.ApplicationSummaryResponse
-	err = json.Unmarshal(resp.Body, &response)
-	if err != nil {
-		return Application{}, translateError(err)
-	}
-
-	return newApplicationFromSummaryResponse(service.config, response), nil
+	return newApplicationFromResponse(service.config, response), nil
 }
 
 func (service ApplicationsService) Delete(guid, token string) error {

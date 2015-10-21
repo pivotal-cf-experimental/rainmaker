@@ -81,49 +81,6 @@ var _ = Describe("ApplicationService", func() {
 		})
 	})
 
-	Describe("Summary", func() {
-		It("returns an app summary", func() {
-			var appGUID string
-
-			By("creating an app", func() {
-				var err error
-
-				app, err = service.Create(rainmaker.Application{
-					Name:      "some-app",
-					SpaceGUID: "some-space-guid",
-				}, token)
-				Expect(err).NotTo(HaveOccurred())
-
-				appGUID = app.GUID
-			})
-
-			By("retrieving the app summary", func() {
-				appSummary, err := service.Summary(appGUID, token)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(appSummary).To(Equal(app))
-			})
-		})
-
-		Context("when the request errors", func() {
-			BeforeEach(func() {
-				config.Host = ""
-				service = rainmaker.NewApplicationsService(config)
-			})
-
-			It("returns the error", func() {
-				_, err := service.Summary("whoops-guid", token)
-				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
-			})
-		})
-
-		Context("when unmarshalling fails", func() {
-			It("returns an error", func() {
-				_, err := service.Summary("very-bad-guid", token)
-				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
-			})
-		})
-	})
-
 	Describe("Delete", func() {
 		var appGUID string
 
@@ -143,7 +100,7 @@ var _ = Describe("ApplicationService", func() {
 			err := service.Delete(appGUID, token)
 			Expect(err).NotTo(HaveOccurred())
 
-			_, err = service.Summary(appGUID, token)
+			_, err = service.Get(appGUID, token)
 			Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
 		})
 

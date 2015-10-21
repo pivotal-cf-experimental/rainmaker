@@ -18,16 +18,18 @@ var _ = Describe("Application", func() {
 			}
 		})
 
-		It("converts a response into an organization", func() {
-			document := documents.ApplicationCreateResponse{}
+		It("converts a response into an application", func() {
+			document := documents.ApplicationResponse{}
 			document.Metadata.GUID = "cool-app"
 			document.Entity.Name = "my cool app"
 			document.Entity.SpaceGUID = "space-123"
+			document.Entity.Diego = true
 
-			application := rainmaker.NewApplicationFromCreateResponse(config, document)
+			application := rainmaker.NewApplicationFromResponse(config, document)
 			expectedApplication := rainmaker.NewApplication(config, "cool-app")
 			expectedApplication.Name = "my cool app"
 			expectedApplication.SpaceGUID = "space-123"
+			expectedApplication.Diego = true
 
 			Expect(application).To(Equal(expectedApplication))
 		})

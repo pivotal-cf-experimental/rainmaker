@@ -1,6 +1,6 @@
 package documents
 
-type ApplicationCreateResponse struct {
+type ApplicationResponse struct {
 	Metadata struct {
 		GUID string
 	}

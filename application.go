@@ -17,21 +17,12 @@ func NewApplication(config Config, guid string) Application {
 	}
 }
 
-func newApplicationFromCreateResponse(config Config, response documents.ApplicationCreateResponse) Application {
+func newApplicationFromResponse(config Config, response documents.ApplicationResponse) Application {
 	app := NewApplication(config, response.Metadata.GUID)
 
 	app.Name = response.Entity.Name
 	app.SpaceGUID = response.Entity.SpaceGUID
 	app.Diego = response.Entity.Diego
-
-	return app
-}
-
-func newApplicationFromSummaryResponse(config Config, response documents.ApplicationSummaryResponse) Application {
-	app := NewApplication(config, response.GUID)
-
-	app.Name = response.Name
-	app.SpaceGUID = response.SpaceGUID
 
 	return app
 }

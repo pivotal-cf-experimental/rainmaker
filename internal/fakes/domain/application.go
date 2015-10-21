@@ -13,12 +13,6 @@ type Application struct {
 	SpaceGUID string
 }
 
-type ApplicationSummary struct {
-	GUID      string
-	Name      string
-	SpaceGUID string `json:"space_guid"`
-}
-
 func NewApplication(guid string) Application {
 	return Application{
 		GUID: guid,
@@ -42,12 +36,4 @@ func (app Application) MarshalJSON() ([]byte, error) {
 			"routes_url":           "/v2/apps/" + app.GUID + "/routes",
 		},
 	})
-}
-
-func (app Application) GetSummary() ApplicationSummary {
-	return ApplicationSummary{
-		GUID:      app.GUID,
-		Name:      app.Name,
-		SpaceGUID: app.SpaceGUID,
-	}
 }
