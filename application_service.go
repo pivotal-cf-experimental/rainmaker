@@ -26,6 +26,7 @@ func (service ApplicationsService) Create(application Application, token string)
 		Body: network.NewJSONRequestBody(documents.CreateApplicationRequest{
 			Name:      application.Name,
 			SpaceGUID: application.SpaceGUID,
+			Diego:     application.Diego,
 		}),
 		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusCreated},
@@ -43,11 +44,30 @@ func (service ApplicationsService) Create(application Application, token string)
 	return newApplicationFromCreateResponse(service.config, response), nil
 }
 
+func (service ApplicationsService) Get(guid, token string) (Application, error) {
+	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
+		Method:                "GET",
+		Path:                  fmt.Sprintf("/v2/apps/%s", guid),
+		Authorization:         network.NewTokenAuthorization(token),
+		AcceptableStatusCodes: []int{http.StatusOK},
+	})
+	if err != nil {
+		return Application{}, translateError(err)
+	}
+
+	var response documents.ApplicationCreateResponse
+	err = json.Unmarshal(resp.Body, &response)
+	if err != nil {
+		return Application{}, translateError(err)
+	}
+
+	return newApplicationFromCreateResponse(service.config, response), nil
+}
+
 func (service ApplicationsService) Summary(guid, token string) (Application, error) {
 	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method:                "GET",
 		Path:                  fmt.Sprintf("/v2/apps/%s/summary", guid),
-		Body:                  network.NewJSONRequestBody(documents.CreateApplicationRequest{}),
 		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
@@ -68,7 +88,6 @@ func (service ApplicationsService) Delete(guid, token string) error {
 	_, err := newNetworkClient(service.config).MakeRequest(network.Request{
 		Method:                "DELETE",
 		Path:                  fmt.Sprintf("/v2/apps/%s", guid),
-		Body:                  network.NewJSONRequestBody(documents.CreateApplicationRequest{}),
 		Authorization:         network.NewTokenAuthorization(token),
 		AcceptableStatusCodes: []int{http.StatusNoContent},
 	})

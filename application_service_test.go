@@ -38,6 +38,49 @@ var _ = Describe("ApplicationService", func() {
 		})
 	})
 
+	Describe("Get", func() {
+		It("returns the app", func() {
+			var appGUID string
+
+			By("creating an app", func() {
+				var err error
+
+				app, err = service.Create(rainmaker.Application{
+					Name:      "some-app",
+					SpaceGUID: "some-space-guid",
+				}, token)
+				Expect(err).NotTo(HaveOccurred())
+
+				appGUID = app.GUID
+			})
+
+			By("retrieving the app", func() {
+				retrievedApp, err := service.Get(appGUID, token)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(retrievedApp).To(Equal(app))
+			})
+		})
+
+		Context("when the request errors", func() {
+			BeforeEach(func() {
+				config.Host = ""
+				service = rainmaker.NewApplicationsService(config)
+			})
+
+			It("returns the error", func() {
+				_, err := service.Get("whoops-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
+		})
+
+		Context("when unmarshalling fails", func() {
+			It("returns an error", func() {
+				_, err := service.Get("very-bad-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
+		})
+	})
+
 	Describe("Summary", func() {
 		It("returns an app summary", func() {
 			var appGUID string

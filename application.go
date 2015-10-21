@@ -7,6 +7,7 @@ type Application struct {
 	GUID      string
 	Name      string
 	SpaceGUID string
+	Diego     bool
 }
 
 func NewApplication(config Config, guid string) Application {
@@ -21,6 +22,7 @@ func newApplicationFromCreateResponse(config Config, response documents.Applicat
 
 	app.Name = response.Entity.Name
 	app.SpaceGUID = response.Entity.SpaceGUID
+	app.Diego = response.Entity.Diego
 
 	return app
 }
