@@ -24,6 +24,10 @@ var _ = Describe("Client", func() {
 		Expect(client.Spaces).To(BeAssignableToTypeOf(rainmaker.SpacesService{}))
 	})
 
+	It("has an applications service", func() {
+		Expect(client.Applications).To(BeAssignableToTypeOf(rainmaker.ApplicationsService{}))
+	})
+
 	It("has a users service", func() {
 		Expect(client.Users).To(BeAssignableToTypeOf(rainmaker.UsersService{}))
 	})

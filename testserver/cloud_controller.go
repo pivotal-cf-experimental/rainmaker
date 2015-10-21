@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/gorilla/mux"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/applications"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/organizations"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/serviceinstances"
@@ -19,6 +20,7 @@ type CloudController struct {
 	Spaces           *domain.Spaces
 	Users            *domain.Users
 	ServiceInstances *domain.ServiceInstances
+	Applications     *domain.Applications
 }
 
 func NewCloudController() *CloudController {
@@ -27,6 +29,7 @@ func NewCloudController() *CloudController {
 		Spaces:           domain.NewSpaces(),
 		Users:            domain.NewUsers(),
 		ServiceInstances: domain.NewServiceInstances(),
+		Applications:     domain.NewApplications(),
 	}
 
 	router := mux.NewRouter()
@@ -34,6 +37,7 @@ func NewCloudController() *CloudController {
 	router.Handle("/v2/spaces{anything:.*}", spaces.NewRouter(cc.Organizations, cc.Spaces, cc.Users))
 	router.Handle("/v2/users{anything:.*}", users.NewRouter(cc.Users, cc.Spaces))
 	router.Handle("/v2/service_instances{anything:.*}", serviceinstances.NewRouter(cc.ServiceInstances))
+	router.Handle("/v2/apps{anything:.*}", applications.NewRouter(cc.Applications))
 
 	handler := cc.requireToken(router)
 	cc.server = httptest.NewUnstartedServer(handler)
@@ -58,6 +62,7 @@ func (cc *CloudController) Reset() {
 	cc.Spaces.Clear()
 	cc.Users.Clear()
 	cc.ServiceInstances.Clear()
+	cc.Applications.Clear()
 }
 
 func (cc *CloudController) requireToken(handler http.Handler) http.Handler {
