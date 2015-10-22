@@ -1,5 +1,7 @@
 package domain
 
+import "sort"
+
 type Applications struct {
 	store map[string]Application
 }
@@ -27,4 +29,24 @@ func (a Applications) Delete(guid string) {
 
 func (a *Applications) Clear() {
 	a.store = make(map[string]Application)
+}
+
+func (a Applications) Len() int {
+	return len(a.store)
+}
+
+func (a Applications) Items() []interface{} {
+	guids := sort.StringSlice([]string{})
+	for _, app := range a.store {
+		guids = append(guids, app.GUID)
+	}
+
+	sort.Sort(guids)
+
+	var items []interface{}
+	for _, guid := range guids {
+		items = append(items, a.store[guid])
+	}
+
+	return items
 }

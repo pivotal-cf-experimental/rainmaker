@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker/internal/documents"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/network"
@@ -42,6 +43,13 @@ func (service ApplicationsService) Create(application Application, token string)
 	}
 
 	return newApplicationFromResponse(service.config, response), nil
+}
+
+func (service ApplicationsService) List(token string) (ApplicationsList, error) {
+	list := NewApplicationsList(service.config, newRequestPlan("/v2/apps", url.Values{}))
+	err := list.Fetch(token)
+
+	return list, err
 }
 
 func (service ApplicationsService) Get(guid, token string) (Application, error) {

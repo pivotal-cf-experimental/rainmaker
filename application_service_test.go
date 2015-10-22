@@ -116,4 +116,32 @@ var _ = Describe("ApplicationService", func() {
 			})
 		})
 	})
+
+	Describe("List", func() {
+		var (
+			app1 rainmaker.Application
+		)
+
+		BeforeEach(func() {
+			var err error
+			app1, err = service.Create(rainmaker.Application{
+				Name:      "some-app",
+				SpaceGUID: "some-space-guid",
+			}, token)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("retrieves a list of all apps from the cloud controller", func() {
+			list, err := service.List(token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(list.TotalResults).To(Equal(1))
+			Expect(list.TotalPages).To(Equal(1))
+			Expect(list.Applications).To(HaveLen(1))
+
+			appGuids := []string{
+				list.Applications[0].GUID,
+			}
+			Expect(appGuids).To(ConsistOf([]string{app1.GUID}))
+		})
+	})
 })
