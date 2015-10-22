@@ -1,7 +1,6 @@
 package rainmaker_test
 
 import (
-	"fmt"
 	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker"
@@ -183,47 +182,6 @@ var _ = Describe("SpacesList", func() {
 
 			list.PrevURL = ""
 			Expect(list.HasPrevPage()).To(BeFalse())
-		})
-	})
-
-	Describe("AllSpaces", func() {
-		BeforeEach(func() {
-			for i := 0; i < 10; i++ {
-				_, err := list.Create(rainmaker.Space{
-					GUID:             fmt.Sprintf("space-%d", i),
-					OrganizationGUID: orgGUID,
-				}, token)
-				Expect(err).NotTo(HaveOccurred())
-			}
-		})
-
-		It("returns a slice of all of spaces", func() {
-			err := list.Fetch(token)
-			Expect(err).NotTo(HaveOccurred())
-
-			list, err = list.Next(token)
-			Expect(err).NotTo(HaveOccurred())
-
-			spaces, err := list.AllSpaces(token)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(spaces).To(HaveLen(10))
-			var guids []string
-			for _, space := range spaces {
-				guids = append(guids, space.GUID)
-			}
-			Expect(guids).To(ConsistOf([]string{
-				"space-0",
-				"space-1",
-				"space-2",
-				"space-3",
-				"space-4",
-				"space-5",
-				"space-6",
-				"space-7",
-				"space-8",
-				"space-9",
-			}))
 		})
 	})
 })

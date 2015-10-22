@@ -79,36 +79,6 @@ func (list SpacesList) HasPrevPage() bool {
 	return list.PrevURL != ""
 }
 
-func (list SpacesList) AllSpaces(token string) ([]Space, error) {
-	l := list
-	var spaces []Space
-
-	for l.HasPrevPage() {
-		var err error
-		l, err = l.Prev(token)
-		if err != nil {
-			return []Space{}, err
-		}
-
-		spaces = append(l.Spaces, spaces...)
-	}
-
-	spaces = append(spaces, list.Spaces...)
-
-	l = list
-	for l.HasNextPage() {
-		var err error
-		l, err = l.Next(token)
-		if err != nil {
-			return []Space{}, err
-		}
-
-		spaces = append(spaces, l.Spaces...)
-	}
-
-	return spaces, nil
-}
-
 func (list *SpacesList) Fetch(token string) error {
 	u := url.URL{
 		Path:     list.plan.Path,

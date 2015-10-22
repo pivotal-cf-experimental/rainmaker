@@ -96,8 +96,13 @@ var _ = Describe("Fetch all the users of a space", func() {
 		Expect(list.TotalPages).To(Equal(3))
 		Expect(list.Users).To(HaveLen(50))
 
-		users, err := list.AllUsers(token)
-		Expect(err).NotTo(HaveOccurred())
+		users := list.Users
+		for list.HasNextPage() {
+			list, err = list.Next(token)
+			Expect(err).NotTo(HaveOccurred())
+
+			users = append(users, list.Users...)
+		}
 
 		Expect(users).To(HaveLen(150))
 	})

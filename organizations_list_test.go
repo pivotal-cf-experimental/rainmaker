@@ -1,7 +1,6 @@
 package rainmaker_test
 
 import (
-	"fmt"
 	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker"
@@ -23,9 +22,10 @@ var _ = Describe("OrganizationsList", func() {
 		}
 		path = "/v2/organizations"
 		token = "token"
-		query := url.Values{}
-		query.Add("page", "1")
-		query.Add("results-per-page", "2")
+		query := url.Values{
+			"page":             {"1"},
+			"results-per-page": {"2"},
+		}
 		list = rainmaker.NewOrganizationsList(config, rainmaker.NewRequestPlan(path, query))
 	})
 
@@ -164,46 +164,6 @@ var _ = Describe("OrganizationsList", func() {
 
 			list.PrevURL = ""
 			Expect(list.HasPrevPage()).To(BeFalse())
-		})
-	})
-
-	Describe("AllOrganizations", func() {
-		BeforeEach(func() {
-			for i := 0; i < 10; i++ {
-				_, err := list.Create(rainmaker.Organization{
-					GUID: fmt.Sprintf("org-%d", i),
-				}, token)
-				Expect(err).NotTo(HaveOccurred())
-			}
-		})
-
-		It("returns a slice of all of organizations", func() {
-			err := list.Fetch(token)
-			Expect(err).NotTo(HaveOccurred())
-
-			list, err = list.Next(token)
-			Expect(err).NotTo(HaveOccurred())
-
-			orgs, err := list.AllOrganizations(token)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(orgs).To(HaveLen(10))
-			var guids []string
-			for _, org := range orgs {
-				guids = append(guids, org.GUID)
-			}
-			Expect(guids).To(ConsistOf([]string{
-				"org-0",
-				"org-1",
-				"org-2",
-				"org-3",
-				"org-4",
-				"org-5",
-				"org-6",
-				"org-7",
-				"org-8",
-				"org-9",
-			}))
 		})
 	})
 })

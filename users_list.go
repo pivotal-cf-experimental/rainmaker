@@ -80,36 +80,6 @@ func (list UsersList) HasPrevPage() bool {
 	return list.PrevURL != ""
 }
 
-func (list UsersList) AllUsers(token string) ([]User, error) {
-	l := list
-	var users []User
-
-	for l.HasPrevPage() {
-		var err error
-		l, err = l.Prev(token)
-		if err != nil {
-			return []User{}, err
-		}
-
-		users = append(l.Users, users...)
-	}
-
-	users = append(users, list.Users...)
-
-	l = list
-	for l.HasNextPage() {
-		var err error
-		l, err = l.Next(token)
-		if err != nil {
-			return []User{}, err
-		}
-
-		users = append(users, l.Users...)
-	}
-
-	return users, nil
-}
-
 func (list UsersList) Associate(userGUID, token string) error {
 	_, err := newNetworkClient(list.config).MakeRequest(network.Request{
 		Method:                "PUT",

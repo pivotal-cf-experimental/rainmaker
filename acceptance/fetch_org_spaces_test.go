@@ -81,8 +81,13 @@ var _ = Describe("Fetch all the spaces of an organization", func() {
 		Expect(list.TotalPages).To(Equal(3))
 		Expect(list.Spaces).To(HaveLen(50))
 
-		spaces, err := list.AllSpaces(token)
-		Expect(err).NotTo(HaveOccurred())
+		spaces := list.Spaces
+		for list.HasNextPage() {
+			list, err = list.Next(token)
+			Expect(err).NotTo(HaveOccurred())
+
+			spaces = append(spaces, list.Spaces...)
+		}
 
 		Expect(spaces).To(HaveLen(150))
 
