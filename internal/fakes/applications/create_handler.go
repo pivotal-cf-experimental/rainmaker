@@ -24,6 +24,7 @@ func (h createHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	application.Name = document.Name
 	application.SpaceGUID = document.SpaceGUID
+	application.Diego = document.Diego
 
 	h.applications.Add(application)
 

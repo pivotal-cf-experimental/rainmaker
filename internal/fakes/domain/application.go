@@ -11,6 +11,7 @@ type Application struct {
 	GUID      string
 	Name      string
 	SpaceGUID string
+	Diego     bool
 }
 
 func NewApplication(guid string) Application {
@@ -29,6 +30,7 @@ func (app Application) MarshalJSON() ([]byte, error) {
 		"entity": map[string]interface{}{
 			"name":                 app.Name,
 			"space_guid":           app.SpaceGUID,
+			"diego":                app.Diego,
 			"space_url":            "/v2/spaces/" + app.SpaceGUID,
 			"stack_url":            "/v2/stacks/some-not-implemented-stack-guid",
 			"events_url":           "/v2/apps/" + app.GUID + "/events",
