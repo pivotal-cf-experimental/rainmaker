@@ -1,9 +1,12 @@
 package network
 
 import (
+	"crypto/tls"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"time"
 )
 
 // Client provides the ability to make HTTP requests.
@@ -98,7 +101,19 @@ func (c Client) MakeRequest(req Request) (Response, error) {
 	}
 
 	var resp *http.Response
-	transport := buildTransport(c.config.SkipVerifySSL)
+
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: c.config.SkipVerifySSL,
+		},
+		Proxy: http.ProxyFromEnvironment,
+		Dial: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 10 * time.Second,
+	}
+
 	if req.DoNotFollowRedirects {
 		resp, err = transport.RoundTrip(request)
 	} else {
@@ -144,6 +159,8 @@ func (c Client) buildRequest(req Request) (*http.Request, error) {
 	}
 
 	request.Header.Set("Accept", "application/json")
+
+	request.Header.Set("Connection", "close")
 
 	if contentType != "" {
 		request.Header.Set("Content-Type", contentType)
