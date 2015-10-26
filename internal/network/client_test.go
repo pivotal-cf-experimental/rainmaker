@@ -78,6 +78,7 @@ var _ = Describe("Client", func() {
 			Expect(receivedRequest.Header).To(HaveKeyWithValue("Authorization", []string{"Bearer TOKEN"}))
 			Expect(receivedRequest.Header).To(HaveKeyWithValue("Content-Length", []string{"19"}))
 			Expect(receivedRequest.Header).To(HaveKeyWithValue("Content-Type", []string{"application/json"}))
+			Expect(receivedRequest.Header).To(HaveKeyWithValue("Connection", []string{"close"}))
 		})
 
 		It("can make more requests than the total allowed number of open files", func() {
