@@ -35,4 +35,8 @@ var _ = Describe("Client", func() {
 	It("has a service instance service", func() {
 		Expect(client.ServiceInstances).To(BeAssignableToTypeOf(rainmaker.ServiceInstancesService{}))
 	})
+
+	It("has a buildpacks service", func() {
+		Expect(client.Buildpacks).To(BeAssignableToTypeOf(rainmaker.BuildpacksService{}))
+	})
 })

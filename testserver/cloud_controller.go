@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/applications"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/buildpacks"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/organizations"
 	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/serviceinstances"
@@ -21,6 +22,7 @@ type CloudController struct {
 	Users            *domain.Users
 	ServiceInstances *domain.ServiceInstances
 	Applications     *domain.Applications
+	Buildpacks       *domain.Buildpacks
 }
 
 func NewCloudController() *CloudController {
@@ -38,6 +40,7 @@ func NewCloudController() *CloudController {
 	router.Handle("/v2/users{anything:.*}", users.NewRouter(cc.Users, cc.Spaces))
 	router.Handle("/v2/service_instances{anything:.*}", serviceinstances.NewRouter(cc.ServiceInstances))
 	router.Handle("/v2/apps{anything:.*}", applications.NewRouter(cc.Applications))
+	router.Handle("/v2/buildpacks{anything:.*}", buildpacks.NewRouter(cc.Buildpacks))
 
 	handler := cc.requireToken(router)
 	cc.server = httptest.NewUnstartedServer(handler)

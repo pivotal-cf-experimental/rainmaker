@@ -19,6 +19,7 @@ type Client struct {
 	Applications     ApplicationsService
 	Users            UsersService
 	ServiceInstances ServiceInstancesService
+	Buildpacks       BuildpacksService
 }
 
 func NewClient(config Config) Client {
@@ -29,6 +30,7 @@ func NewClient(config Config) Client {
 		Applications:     NewApplicationsService(config),
 		Users:            NewUsersService(config),
 		ServiceInstances: NewServiceInstancesService(config),
+		Buildpacks:       NewBuildpacksService(config),
 	}
 }
 

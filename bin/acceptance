@@ -9,6 +9,8 @@ cf logout > /dev/null
 cf api $CC_HOST --skip-ssl-validation > /dev/null
 cf auth $CF_ADMIN_USERNAME $CF_ADMIN_PASSWORD > /dev/null
 
+cf buildpacks | grep "^rainmaker-" | awk '{print $1}' | xargs -n 1 cf delete-buildpack -f # DELETE ME when buildpacks can be deleted by the client
+
 export UAA_TOKEN=`cf oauth-token | grep bearer | cut -f2 -d' '`
 
 ginkgo \
