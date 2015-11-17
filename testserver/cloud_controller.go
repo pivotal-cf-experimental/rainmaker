@@ -6,13 +6,13 @@ import (
 	"regexp"
 
 	"github.com/gorilla/mux"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/applications"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/buildpacks"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/organizations"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/serviceinstances"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/spaces"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/users"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/applications"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/buildpacks"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/domain"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/organizations"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/serviceinstances"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/spaces"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/users"
 )
 
 type CloudController struct {

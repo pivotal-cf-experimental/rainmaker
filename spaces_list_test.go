@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	"github.com/pivotal-cf-experimental/rainmaker"
-	"github.com/pivotal-cf-experimental/rainmaker/internal/fakes/domain"
+	"github.com/pivotal-cf-experimental/rainmaker/internal/server/domain"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

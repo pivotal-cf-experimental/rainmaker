@@ -13,7 +13,7 @@ var fakeCloudController *testserver.CloudController
 
 func TestRainmakerSuite(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Rainmaker Suite")
+	RunSpecs(t, "rainmaker")
 }
 
 var _ = BeforeSuite(func() {
