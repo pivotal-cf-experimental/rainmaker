@@ -2,9 +2,16 @@
 
 DIR=`cd $(dirname $0)/.. && pwd`
 
-ginkgo \
-	-r \
-	-p=true \
-	-succinct=true \
-	-skipPackage=acceptance \
-	$DIR
+function run() {
+	ginkgo \
+		-r \
+		-p=true \
+		-succinct=true \
+		$@
+}
+
+if [[ -z "${1}" ]]; then
+	run -skipPackage=acceptance $DIR
+else
+	run $@
+fi

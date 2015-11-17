@@ -9,6 +9,7 @@ import (
 )
 
 type createHandler struct {
+	generateGUID guidGenerator
 	applications *domain.Applications
 }
 
@@ -20,19 +21,13 @@ func (h createHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 
-	application := domain.NewApplication(domain.NewGUID("app"))
-
+	application := domain.NewApplication(h.generateGUID("app"))
 	application.Name = document.Name
 	application.SpaceGUID = document.SpaceGUID
 	application.Diego = document.Diego
 
 	h.applications.Add(application)
 
-	response, err := json.Marshal(application)
-	if err != nil {
-		panic(err)
-	}
-
 	w.WriteHeader(http.StatusCreated)
-	w.Write(response)
+	json.NewEncoder(w).Encode(application)
 }
