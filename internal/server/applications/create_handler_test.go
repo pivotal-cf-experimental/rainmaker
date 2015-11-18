@@ -43,17 +43,13 @@ var _ = Describe("createHandler", func() {
 	It("creates applications", func() {
 		router.ServeHTTP(recorder, request)
 		Expect(recorder.Code).To(Equal(http.StatusCreated))
-
-		var responseBody map[string]interface{}
-		err := json.NewDecoder(recorder.Body).Decode(&responseBody)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(responseBody).To(Equal(map[string]interface{}{
-			"metadata": map[string]interface{}{
+		Expect(recorder.Body).To(MatchJSON(`{
+			"metadata": {
 				"guid":       "some-app-guid",
 				"created_at": "0001-01-01T00:00:00Z",
-				"updated_at": "0001-01-01T00:00:00Z",
+				"updated_at": "0001-01-01T00:00:00Z"
 			},
-			"entity": map[string]interface{}{
+			"entity": {
 				"name":                 "some-app",
 				"space_guid":           "some-space",
 				"diego":                true,
@@ -61,9 +57,9 @@ var _ = Describe("createHandler", func() {
 				"routes_url":           "/v2/apps/some-app-guid/routes",
 				"service_bindings_url": "/v2/apps/some-app-guid/service_bindings",
 				"space_url":            "/v2/spaces/some-space",
-				"stack_url":            "/v2/stacks/some-not-implemented-stack-guid",
-			},
-		}))
+				"stack_url":            "/v2/stacks/some-not-implemented-stack-guid"
+			}
+		}`))
 	})
 
 	It("stores the new app in the applications collection", func() {
