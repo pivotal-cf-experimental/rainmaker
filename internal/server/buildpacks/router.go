@@ -7,10 +7,12 @@ import (
 	"github.com/pivotal-cf-experimental/rainmaker/internal/server/domain"
 )
 
-func NewRouter(buildpacks *domain.Buildpacks) http.Handler {
+type guidGenerator func(string) string
+
+func NewRouter(guids guidGenerator, buildpacks *domain.Buildpacks) http.Handler {
 	router := mux.NewRouter()
 
-	router.Handle("/v2/buildpacks", createHandler{buildpacks}).Methods("POST")
+	router.Handle("/v2/buildpacks", createHandler{guids, buildpacks}).Methods("POST")
 
 	return router
 }

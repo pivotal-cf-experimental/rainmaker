@@ -29,7 +29,7 @@ var _ = Describe("BuildpacksService", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(buildpack.GUID).NotTo(BeEmpty())
 			Expect(buildpack.URL).To(Equal(fmt.Sprintf("/v2/buildpacks/%s", buildpack.GUID)))
-			Expect(buildpack.CreatedAt).To(BeTemporally("~", time.Now().UTC()))
+			Expect(buildpack.CreatedAt).To(Equal(time.Time{}))
 			Expect(buildpack.UpdatedAt).To(Equal(time.Time{}))
 			Expect(buildpack.Name).To(Equal("my-buildpack"))
 			Expect(buildpack.Position).To(Equal(1))

@@ -40,7 +40,7 @@ func NewCloudController() *CloudController {
 	router.Handle("/v2/users{anything:.*}", users.NewRouter(cc.Users, cc.Spaces))
 	router.Handle("/v2/service_instances{anything:.*}", serviceinstances.NewRouter(cc.ServiceInstances))
 	router.Handle("/v2/apps{anything:.*}", applications.NewRouter(domain.NewGUID, cc.Applications))
-	router.Handle("/v2/buildpacks{anything:.*}", buildpacks.NewRouter(cc.Buildpacks))
+	router.Handle("/v2/buildpacks{anything:.*}", buildpacks.NewRouter(domain.NewGUID, cc.Buildpacks))
 
 	handler := cc.requireToken(router)
 	cc.server = httptest.NewUnstartedServer(handler)
