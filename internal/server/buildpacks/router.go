@@ -13,6 +13,7 @@ func NewRouter(guids guidGenerator, buildpacks *domain.Buildpacks) http.Handler 
 	router := mux.NewRouter()
 
 	router.Handle("/v2/buildpacks", createHandler{guids, buildpacks}).Methods("POST")
+	router.Handle("/v2/buildpacks/{guid}", getHandler{buildpacks}).Methods("GET")
 
 	return router
 }

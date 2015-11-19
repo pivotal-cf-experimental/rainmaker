@@ -32,6 +32,7 @@ func NewCloudController() *CloudController {
 		Users:            domain.NewUsers(),
 		ServiceInstances: domain.NewServiceInstances(),
 		Applications:     domain.NewApplications(),
+		Buildpacks:       domain.NewBuildpacks(),
 	}
 
 	router := mux.NewRouter()

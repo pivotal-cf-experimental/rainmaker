@@ -29,6 +29,20 @@ func (h createHandler) ServeHTTP(w http.ResponseWriter, request *http.Request) {
 
 	buildpack := domain.NewBuildpack(h.generateGUID("buildpack"))
 	buildpack.Name = document.Name
+	if document.Position != nil {
+		buildpack.Position = *document.Position
+	}
+	if document.Enabled != nil {
+		buildpack.Enabled = *document.Enabled
+	}
+	if document.Locked != nil {
+		buildpack.Locked = *document.Locked
+	}
+	if document.Filename != nil {
+		buildpack.Filename = *document.Filename
+	}
+
+	h.buildpacks.Add(buildpack)
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(buildpack)

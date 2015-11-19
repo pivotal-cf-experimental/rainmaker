@@ -26,7 +26,7 @@ var _ = Describe("Buildpack lifecycle", func() {
 	})
 
 	It("can create a new buildpack", func() {
-		buildpack, err := client.Buildpacks.Create("rainmaker-buildpack", token)
+		buildpack, err := client.Buildpacks.Create("rainmaker-buildpack", token, nil)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(buildpack.GUID).NotTo(BeEmpty())
 		Expect(buildpack.URL).To(Equal(fmt.Sprintf("/v2/buildpacks/%s", buildpack.GUID)))
