@@ -94,7 +94,10 @@ var _ = Describe("BuildpacksService", func() {
 		})
 
 		Context("when the buildpack does not exist", func() {
-			PIt("returns an error", func() {})
+			It("returns an error", func() {
+				_, err := service.Get("does-not-exist", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+			})
 		})
 
 		Context("when the request errors", func() {
@@ -103,6 +106,29 @@ var _ = Describe("BuildpacksService", func() {
 
 		Context("when the response cannot be unmarshalled", func() {
 			PIt("returns the error", func() {})
+		})
+	})
+
+	Describe("Delete", func() {
+		var (
+			buildpack rainmaker.Buildpack
+		)
+
+		BeforeEach(func() {
+			var err error
+			buildpack, err = service.Create("my-buildpack", token, &rainmaker.CreateBuildpackOptions{
+				Position: rainmaker.IntPtr(1),
+				Enabled:  rainmaker.BoolPtr(true),
+			})
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("deletes the buildpack", func() {
+			err := service.Delete(buildpack.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			_, err = service.Get(buildpack.GUID, token)
+			Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
 		})
 	})
 })

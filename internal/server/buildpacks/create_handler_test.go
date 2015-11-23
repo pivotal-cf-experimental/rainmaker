@@ -64,7 +64,9 @@ var _ = Describe("createHandler", func() {
 
 	It("stores the buildpack in the collection", func() {
 		router.ServeHTTP(recorder, request)
-		Expect(buildpacksCollection.Get("some-buildpack-guid")).To(Equal(domain.Buildpack{
+		bp, ok := buildpacksCollection.Get("some-buildpack-guid")
+		Expect(ok).To(BeTrue())
+		Expect(bp).To(Equal(domain.Buildpack{
 			GUID:     "some-buildpack-guid",
 			Name:     "some-buildpack",
 			Position: 2,

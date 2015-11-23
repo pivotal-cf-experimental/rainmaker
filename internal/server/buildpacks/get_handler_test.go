@@ -59,4 +59,11 @@ var _ = Describe("getHandler", func() {
 			}
 		}`))
 	})
+
+	It("returns a 404 when the buildpack does not exist", func() {
+		request.URL.Path = "/v2/buildpacks/does-not-exist"
+
+		router.ServeHTTP(recorder, request)
+		Expect(recorder.Code).To(Equal(http.StatusNotFound))
+	})
 })

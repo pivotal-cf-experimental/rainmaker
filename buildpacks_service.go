@@ -66,7 +66,7 @@ func (b BuildpacksService) Get(guid string, token string) (Buildpack, error) {
 		AcceptableStatusCodes: []int{http.StatusOK},
 	})
 	if err != nil {
-		panic(err)
+		return Buildpack{}, translateError(err)
 	}
 
 	var response documents.BuildpackResponse
@@ -76,4 +76,18 @@ func (b BuildpacksService) Get(guid string, token string) (Buildpack, error) {
 	}
 
 	return newBuildpackFromResponse(b.config, response), nil
+}
+
+func (b BuildpacksService) Delete(guid, token string) error {
+	_, err := newNetworkClient(b.config).MakeRequest(network.Request{
+		Method:                "DELETE",
+		Path:                  fmt.Sprintf("/v2/buildpacks/%s", guid),
+		Authorization:         network.NewTokenAuthorization(token),
+		AcceptableStatusCodes: []int{http.StatusNoContent},
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

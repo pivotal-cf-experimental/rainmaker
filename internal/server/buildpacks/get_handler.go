@@ -16,7 +16,12 @@ type getHandler struct {
 func (h getHandler) ServeHTTP(w http.ResponseWriter, request *http.Request) {
 	path := request.URL.Path
 	guid := strings.TrimPrefix(path, "/v2/buildpacks/")
-	buildpack := h.buildpacks.Get(guid)
+	buildpack, ok := h.buildpacks.Get(guid)
+
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
 	json.NewEncoder(w).Encode(buildpack)
 }
