@@ -3,6 +3,8 @@ package rainmaker_test
 import (
 	"fmt"
 	"time"
+	"net/http"
+	"net/http/httptest"
 
 	"github.com/pivotal-cf-experimental/rainmaker"
 
@@ -129,6 +131,73 @@ var _ = Describe("BuildpacksService", func() {
 
 			_, err = service.Get(buildpack.GUID, token)
 			Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+		})
+	})
+
+	Describe("Update", func() {
+		var (
+			buildpack rainmaker.Buildpack
+		)
+
+		BeforeEach(func() {
+			var err error
+			buildpack, err = service.Create("my-buildpack", token, &rainmaker.CreateBuildpackOptions{
+				Position: rainmaker.IntPtr(1),
+				Enabled:  rainmaker.BoolPtr(true),
+				Locked:   rainmaker.BoolPtr(false),
+				Filename: rainmaker.StringPtr("some-file"),
+			})
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("modifies the buildpack with the updated values", func() {
+			buildpack.Name = "updated-buildpack"
+			buildpack.Enabled = false
+			buildpack.Position = 3
+			buildpack.Locked = true
+			buildpack.Filename = "some-other-file"
+
+			updatedBuildpack, err := service.Update(buildpack, token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(updatedBuildpack.Name).To(Equal("updated-buildpack"))
+			Expect(updatedBuildpack.Enabled).To(BeFalse())
+			Expect(updatedBuildpack.Position).To(Equal(3))
+			Expect(updatedBuildpack.Locked).To(BeTrue())
+			Expect(updatedBuildpack.Filename).To(Equal("some-other-file"))
+
+			fetchedBuildpack, err := service.Get(buildpack.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fetchedBuildpack.Name).To(Equal("updated-buildpack"))
+			Expect(fetchedBuildpack.Enabled).To(BeFalse())
+			Expect(fetchedBuildpack.Position).To(Equal(3))
+			Expect(fetchedBuildpack.Locked).To(BeTrue())
+			Expect(fetchedBuildpack.Filename).To(Equal("some-other-file"))
+		})
+
+		Context("when the buildpack does not exist", func() {
+			It("returns an error", func() {
+				buildpack.GUID = "some-missing-guid"
+
+				_, err := service.Update(buildpack, token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.NotFoundError{}))
+			})
+		})
+
+		Context("when the API returns some malformed JSON", func() {
+			It("returns an error", func() {
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusCreated)
+					w.Write([]byte(`%%%%`))
+				}))
+				defer server.Close()
+
+				service = rainmaker.NewBuildpacksService(rainmaker.Config{
+					Host: server.URL,
+				})
+
+				_, err := service.Update(buildpack, token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
 		})
 	})
 })

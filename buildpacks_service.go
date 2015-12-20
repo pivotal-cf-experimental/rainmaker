@@ -91,3 +91,32 @@ func (b BuildpacksService) Delete(guid, token string) error {
 
 	return nil
 }
+
+func (b BuildpacksService) Update(buildpack Buildpack, token string) (Buildpack, error) {
+	requestBody := documents.UpdateBuildpackRequest{
+		Position: &buildpack.Position,
+		Enabled:  &buildpack.Enabled,
+		Locked:   &buildpack.Locked,
+		Filename: &buildpack.Filename,
+		Name:     &buildpack.Name,
+	}
+
+	resp, err := newNetworkClient(b.config).MakeRequest(network.Request{
+		Method:                "PUT",
+		Path:                  fmt.Sprintf("/v2/buildpacks/%s", buildpack.GUID),
+		Body:                  network.NewJSONRequestBody(requestBody),
+		Authorization:         network.NewTokenAuthorization(token),
+		AcceptableStatusCodes: []int{http.StatusCreated},
+	})
+	if err != nil {
+		return Buildpack{}, translateError(err)
+	}
+
+	var response documents.BuildpackResponse
+	err = json.Unmarshal(resp.Body, &response)
+	if err != nil {
+		return Buildpack{}, translateError(err)
+	}
+
+	return newBuildpackFromResponse(b.config, response), nil
+}
