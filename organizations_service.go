@@ -84,6 +84,31 @@ func (service OrganizationsService) Delete(guid, token string) error {
 	return nil
 }
 
+func (service OrganizationsService) Update(org Organization, token string) (Organization, error) {
+	resp, err := newNetworkClient(service.config).MakeRequest(network.Request{
+		Method: "PUT",
+		Path:   fmt.Sprintf("/v2/organizations/%s", org.GUID),
+		Body: network.NewJSONRequestBody(documents.UpdateOrganizationRequest{
+			Name:                org.Name,
+			Status:              org.Status,
+			QuotaDefinitionGUID: org.QuotaDefinitionGUID,
+		}),
+		Authorization:         network.NewTokenAuthorization(token),
+		AcceptableStatusCodes: []int{http.StatusCreated},
+	})
+	if err != nil {
+		return Organization{}, translateError(err)
+	}
+
+	var response documents.OrganizationResponse
+	err = json.Unmarshal(resp.Body, &response)
+	if err != nil {
+		return Organization{}, translateError(err)
+	}
+
+	return newOrganizationFromResponse(service.config, response), nil
+}
+
 func (service OrganizationsService) ListSpaces(guid, token string) (SpacesList, error) {
 	list := NewSpacesList(service.config, newRequestPlan("/v2/organizations/"+guid+"/spaces", url.Values{}))
 	err := list.Fetch(token)

@@ -1,6 +1,9 @@
 package rainmaker_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+
 	"github.com/pivotal-cf-experimental/rainmaker"
 
 	. "github.com/onsi/ginkgo"
@@ -93,6 +96,51 @@ var _ = Describe("OrganizationsService", func() {
 		Context("when unmarshalling fails", func() {
 			It("returns an error", func() {
 				_, err := service.Get("very-bad-guid", token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
+		})
+	})
+
+	Describe("Update", func() {
+		It("updates the organization", func() {
+			organization.Name = "some-updated-organization"
+			organization.Status = "some-updated-status"
+			organization.QuotaDefinitionGUID = "some-quota-definition-guid"
+
+			updatedOrg, err := service.Update(organization, token)
+			Expect(err).NotTo(HaveOccurred())
+
+			fetchedOrg, err := service.Get(organization.GUID, token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fetchedOrg).To(Equal(updatedOrg))
+		})
+
+		Context("failure cases", func() {
+			It("returns an error when malformed JSON is returned", func() {
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+					w.WriteHeader(http.StatusCreated)
+					w.Write([]byte("banana"))
+				}))
+
+				config = rainmaker.Config{
+					Host: server.URL,
+				}
+				service = rainmaker.NewClient(config).Organizations
+
+				_, err := service.Update(organization, token)
+				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
+			})
+			It("returns an error when receiving an unexpected status code", func() {
+				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+					w.WriteHeader(http.StatusBadRequest)
+				}))
+
+				config = rainmaker.Config{
+					Host: server.URL,
+				}
+				service = rainmaker.NewClient(config).Organizations
+
+				_, err := service.Update(organization, token)
 				Expect(err).To(BeAssignableToTypeOf(rainmaker.Error{}))
 			})
 		})
